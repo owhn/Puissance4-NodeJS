@@ -9,7 +9,8 @@ const bdd = require("./bdd.js")
 
 const PORT = process.env.PORT || 3000; //3000 si port non imposé mais si imposé, process.env.PORT s'occupe de tout
 const app = express(); //Initialisation express
-app.use(express.static(__dirname + "/public"));
+app.use(express.static("public"));
+
 const server = http.createServer(app); //Création serveur http
 const io = socket(server); //Initialisation de socket.io
 
@@ -54,25 +55,35 @@ io.on("connection", (socket) => {
     });
 
     socket.on("connexionCompte", async (data)=>{
-        //console.log("connexionCompte p/m : " +data.pseudo + " " + data.mdp);
-        const rep = await bdd.loginUser(data.pseudo,data.mdp);
-        console.log("afterbdd");
-        if(rep.ok===false){
-            let msg="login fail";
-            socket.emit("erreurBDD", msg);
-        }
-        else{
-            let msg="login ok";
-            console.log(msg);
+        console.log("connexionCompte p/m : " +data.pseudo + " " + data.mdp);
+        try {
+            const result = await bdd.loginUser(data.pseudo,data.mdp);
+            console.log("after bdd.loginUser");
+            if(!result.ok){
+                socket.emit("erreurBDD", result.msg);
+            }
+            else if (result.ok){
+                const elo = await bdd.getElo(data.pseudo);
+                socket.emit("login_ok", {pseudo : result.user.pseudo, elo});
+                let msg="login ok";
+                console.log(msg + " elseif");
+            }
+        }catch(e){
+            socket.emit("erreurBDD", "erreur BDD");
         }
     });
     
     socket.on("creerCompte", async (data)=>{
-    // console.log("creerCompte");
-    const rep = await bdd.createUser(data.pseudo,data.mdp);
-        return rep;
-    })
-
+        console.log("creerCompte p/m : " + data.pseudo + " " + data.mdp);
+        try {
+            let returned = await bdd.createUser(data.pseudo, data.mdp);
+            console.log("username : " + returned);
+            let elo = await bdd.getElo();
+            socket.emit("register_ok", {pseudo : data.pseudo, elo});
+        } catch (e) {
+            socket.emit("erreurBDD", "Pseudo déjà pris");
+        }
+    });
 
     socket.on("queue",(data)=>{
 
@@ -94,6 +105,6 @@ async function Demarrage(){
     server.listen(PORT, "localhost",()=>{
         console.log("serv démarré : http://localhost:"+PORT);
     });
-}
+};
 
 Demarrage();

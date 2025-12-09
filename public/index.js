@@ -27,24 +27,43 @@ socket.on("setLocalPlayerID",(data)=>{
 
 
 
-let pseudo=document.getElementById("txtPseudo");//ajt .value qd créé
-let mdp=document.getElementById("txtMdp");//ajt .value qd créé
+function test(){
+    creerCompte();
+}
 
-function connexionCompte(pseudo,mdp){
+function connexionCompte(){
     // console.log("connexionCompte");
+    // let pseudo=document.getElementById("txtPseudo");//ajt .value qd créé
+    // let mdp=document.getElementById("txtMdp");//ajt .value qd créé
+    // pseudo="zozo";
+    // mdp="cawe";
     socket.emit("connexionCompte",{pseudo,mdp});
-    
 }
 
-function creerCompte(pseudo,mdp){
+socket.on("login_ok", (data)=>{
+    joueur.pseudo=data.pseudo;
+    joueur.elo=data.elo;
+    console.log("login ok : "+data.pseudo+ " " + data.elo);
+    document.getElementById("x").textContent=joueur.pseudo;
+
+});
+
+function creerCompte(){
     // console.log("creerCompte");
-    socket.emit("creerCompte",{pseudo,mdp});
-   
-    connexionCompte(pseudo,mdp);
+    let pseudo=document.getElementById("txtPseudo");//ajt .value qd créé
+    let mdp=document.getElementById("txtMdp");//ajt .value qd créé
+    pseudo="congo";
+    mdp="loco";
+    socket.emit("creerCompte",{pseudo,mdp});    
 }
+
+socket.on("register_ok",(data)=>{
+    console.log("création de compte OK !");
+    connexionCompte(data.pseudo,data.mdp);
+});
 
 socket.on("erreurBDD",(msg)=>{
-    console.log("msgErr");
+    console.log(msg);
 });
 
 function qPartie(){
