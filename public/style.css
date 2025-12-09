@@ -1,1 +1,252 @@
 /* FRONT END : Mathys */
+@font-face {
+    font-family: "cartoon";
+    src: url("Star\ Cartoon.otf") format("truetype");
+  }
+
+
+
+/*/////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////*/
+
+/*Fond*/
+body{
+    background-color: #141414;
+}
+
+blockquote{
+    margin-block-start: 0px;
+    margin-block-end: 0px;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+}
+
+/*/////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////*/
+/*Menu gauche*/
+h1{
+    color: #fcfcfc;
+    font-family: "cartoon";
+    font-size: 20px;
+    text-align: center;
+}
+.gros{
+    margin-top: 15px;
+    font-size: 30px;
+    text-decoration: underline;
+}
+.btn{
+    color: #272727;
+    font-size: 20px;
+}
+
+.ptibtn{
+    color: #272727;
+    font-size: 15px;
+    margin-top: 5px;
+}
+
+.zone_menu{
+    position: absolute;
+    margin-top: 142px;
+    margin-left: 150px;
+    width: 300px;
+    height : 720px;
+
+    display: block;
+
+    background-color: #585758;
+    border-radius:  20px / 20px ;
+    box-shadow:  0px 0px 25px rgb(255, 255, 255);
+
+
+}
+
+/*Truc de connexion*/
+.txtPseudo{
+    background-color: #eeeeee;
+    display: block;
+    width: 150px;
+    height: 25px;
+    margin: 0 auto;
+    text-align: center;
+    border-radius: 20px / 20px;
+    border: 0px;
+    box-shadow: inset 3px 3px 6px rgba(0,0,0,0.3);
+}
+
+.txtMdp{
+    background-color: #eeeeee;
+    display: block;
+    width: 200px;
+    height: 25px;
+    margin: 0 auto;
+    text-align: center;
+    border-radius: 20px / 20px;
+    border: 0px;
+    box-shadow: inset 3px 3px 6px rgba(0,0,0,0.3);
+
+}
+.connecter{
+    background-color: #56b6ff;
+    display: block;
+    width: 200px;
+    height: 30px;
+    margin: 0 auto;
+    margin-top: 10px;
+    text-align: center;
+    border-radius: 20px / 20px;
+    border: 0px;
+    box-shadow: inset 3px 3px 6px rgba(0,0,0,0.3);
+    border: 2px solid #eeeeee;
+
+}
+
+/*Trucs de parties*/
+
+.partie{
+    background-color: #56b6ff;
+    display: block;
+    width: 250px;
+    height: 50px;
+    margin: 0 auto;
+    margin-top: 10px;
+    text-align: center;
+    border-radius: 20px / 20px;
+    border: 0px;
+    box-shadow: inset 3px 3px 6px rgba(0,0,0,0.3);
+    border: 2px solid #eeeeee;
+
+}
+
+.txtCode{
+    background-color: #eeeeee;
+    display: block;
+    width: 200px;
+    height: 25px;
+    margin: 0 auto;
+    text-align: center;
+    border-radius: 20px / 20px;
+    border: 0px;
+    box-shadow: inset 3px 3px 6px rgba(0,0,0,0.3);
+}
+
+/*Truc dans partie*/
+
+.quitter{
+    background-color: #ec3c30;
+    display: block;
+    width: 250px;
+    height: 50px;
+    margin: 0 auto;
+    margin-top: 10px;
+    text-align: center;
+    border-radius: 20px / 20px;
+    border: 0px;
+    box-shadow: inset 3px 3px 6px rgba(0,0,0,0.3);
+    border: 2px solid #eeeeee;
+
+}
+
+.deconnecter{
+    background-color: #ec3c30;
+    display: block;
+    width: 250px;
+    height: 50px;
+    margin: 0 auto;
+    margin-top: 10px;
+    text-align: center;
+    border-radius: 20px / 20px;
+    border: 0px;
+    box-shadow: inset 3px 3px 6px rgba(0,0,0,0.3);
+    border: 2px solid #eeeeee;
+}
+
+/*/////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////*/
+
+
+/*Plateau(et autour proche)*/
+
+.zone-plateau {
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    gap: 0px;              
+    margin-top: -25px;
+}
+
+.board {
+    position: absolute;
+    width: 840px;
+    height: 720px;
+    margin: 0px auto;
+    margin-top:142px;
+  
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+  
+    background-color: #007cd9;
+    border: 4px solid rgb(255, 255, 255);
+    border-radius: 5%;
+    padding: 15px;
+    box-sizing: border-box;
+    z-index: 1;
+    box-shadow: 0px 0px 50px rgb(31, 221, 255);
+
+
+}
+
+.board div {
+    width: 85%;
+    height: 85%;
+  
+    margin: auto;
+  
+    border: 3px solid white;
+    border-radius: 50%;
+    background-color: #474747;
+    z-index: 1;
+}
+
+.board div.rouge {
+    background: #e22525 url("sfspider.png") center/90% no-repeat;
+    border-color: white;
+  }
+  
+  .board div.jaune {
+    background: #ffe600 url("spidernoir.png") center/120% no-repeat;
+    border-color: white;
+  }
+
+  .board div.booba {
+    background: #ffe600 url("booba.png") center/170% no-repeat;
+    border-color: white;
+  }
+
+  .board div.kaaris {
+    background: #e22525 url("kaaris.png") center/120% no-repeat;
+    border-color: white;
+  }
+
+  .board div.gf {
+    background: #e22525 url("gf.png") center/170% no-repeat;
+    border-color: white;
+  }
+
+  .board div.pgf {
+    background: #ffe600 url("pgf.png") center/150% no-repeat;
+    border-color: white;
+  }
+
+/*/////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////*/
+
+
+
+
