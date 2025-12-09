@@ -1,1 +1,146 @@
 /* FRONT END : Mathys */
+@font-face {
+    font-family: "cartoon";
+    src: url("Star\ Cartoon.otf") format("truetype");
+  }
+
+
+
+/*/////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////*/
+
+/*Fond*/
+body{
+    background-color: #a7a5a5;
+}
+
+/*/////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////*/
+/*Menu gauche*/
+h1{
+    font-family: "cartoon";
+    font-size: 20px;
+    text-align: center;
+}
+
+.zone_menu{
+    position: absolute;
+    margin-top: 142px;
+    margin-left: 10%;
+    width: 300px;
+    height : 720px;
+
+    display: block;
+
+    background-color: #e22525;
+    border-radius:  20px / 20px ;
+
+}
+
+.txtPseudo{
+    display: block;
+    width: 150px;
+    height: 25px;
+    margin: 0 auto;
+    text-align: center;
+    border-radius: 20px / 20px;
+    border: 0px;
+
+}
+
+.txtMdp{
+    display: block;
+    width: 200px;
+    height: 25px;
+    margin: 0 auto;
+    text-align: center;
+    border-radius: 20px / 20px;
+    border: 0px;
+
+}
+
+/*/////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////*/
+
+
+/*Plateau(et autour proche)*/
+
+.zone-plateau {
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    gap: 0px;              
+    margin-top: -25px;
+}
+
+.board {
+    position: absolute;
+    width: 840px;
+    height: 720px;
+    margin: 0px auto;
+    margin-top:142px;
+  
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+  
+    background-color: #007cd9;
+    border: 4px solid rgb(255, 255, 255);
+    border-radius: 5%;
+    padding: 15px;
+    box-sizing: border-box;
+    z-index: 1;
+}
+
+.board div {
+    width: 85%;
+    height: 85%;
+  
+    margin: auto;
+  
+    border: 3px solid white;
+    border-radius: 50%;
+    background-color: #474747;
+    z-index: 1;
+}
+
+.board div.rouge {
+    background: #e22525 url("sfspider.png") center/90% no-repeat;
+    border-color: white;
+  }
+  
+  .board div.jaune {
+    background: #ffe600 url("spidernoir.png") center/120% no-repeat;
+    border-color: white;
+  }
+
+  .board div.booba {
+    background: #ffe600 url("booba.png") center/170% no-repeat;
+    border-color: white;
+  }
+
+  .board div.kaaris {
+    background: #e22525 url("kaaris.png") center/120% no-repeat;
+    border-color: white;
+  }
+
+  .board div.gf {
+    background: #e22525 url("gf.png") center/170% no-repeat;
+    border-color: white;
+  }
+
+  .board div.pgf {
+    background: #ffe600 url("pgf.png") center/150% no-repeat;
+    border-color: white;
+  }
+
+/*/////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////*/
+
+
+
+
