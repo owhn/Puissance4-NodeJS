@@ -12,16 +12,33 @@ app.use(express.static(__dirname + "/public"));
 const server = http.createServer(app); //Création serveur http
 const io = socket(server); //Initialisation de socket.io
 
-console.log(tab[5][6])
+const rooms = {
+    joueurs: [],
+    IDs: [],
+    votes: [],
+    turn: 0,
+    board: creerTabVide()
+}; //rooms[roomID] = {joueurs = [socketID(j1), socketID(j2)] , ID = [IDs dans bdd]}
+
+const privateRooms = {
+    joueurs: [],
+    IDs: [],
+    votes: [],
+    turn: 0,
+    board: creerTabVide()
+}; 
+
+const rankedQueue = [];// joueur : {socketID, elo}
+const queue = [];// socketID
 
 function creerTabVide(){
     return [
-            [[],[],[],[],[],[],[]],
-            [[],[],[],[],[],[],[]],
-            [[],[],[],[],[],[],[]],
-            [[],[],[],[],[],[],[]],
-            [[],[],[],[],[],[],[]],
-            [[],[],[],[],[],[],[]]
+        [0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0]
         ];
 }
 
