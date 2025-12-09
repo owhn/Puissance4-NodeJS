@@ -14,23 +14,49 @@
         <!--////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////
         /////////////////////////////////////////////////////////////////////////////////-->
+        
+        
+        <div class = "zone_menu" >
+            <blockquote id = "blockConnect"  >
+                <h1 class = "gros">Connexion</h1>
+                <h1>Votre pseudo : </h1> 
+                <input type = "text" class ="txtPseudo" id = "txtPseudo" placeholder="Pseudo">
+                <h1>Votre mot de passe : </h1> 
+                <input type = "text" class ="txtMdp" id = "txtMdp" placeholder="Mot de Passe">
+                <button class = "connecter" id = "connecter" ><h1 class = "ptibtn">Se Connecter</h1></button>
+                <button class = "connecter" id = "creerCompte" ><h1 class = "ptibtn">Creer un compte</h1></button>
 
-        <div class = "zone_menu">
+            </blockquote>
 
-            <h1>Votre pseudo : </h1> 
-            <input type = "text" class ="txtPseudo" id = "txtPseudo" placeholder="Pseudo">
-            <h1>Votre mot de passe : </h1> 
-            <input type = "text" class ="txtMdp" id = "txtMdp" placeholder="Mot de Passe">
-            <button class = "connecter" id = "connecter" onclick="connexionCompte()">Se Connecter</button>
-            <button class = "connecter" id = "connecter" onclick="connexionCompte()">Se Connecter</button>
+            <blockquote id = "deconnect" hidden >
+                <h1>Pseudo : </h1><h1 id = "pseudo">XXXX</h1>
+
+                <button class = "deconnecter" id = "seDeconnecter" ><h1 class = "btn">Se deconnecter</h1></button>
 
 
+            </blockquote>
 
+            <blockquote id ="dansPartie" hidden >
+                <button class = "quitter" id = "quitPartie" ><h1 class = "btn">Quitter la partie</h1></button>
+
+
+            </blockquote>
+
+            <hr>
+            <h1 class = "gros">Partie</h1>
+
+            <button class = "partie" id = "matchmaking" onclick="qPartie()"><h1 class = "btn">Trouvage de partie</h1></button>
+            <button class = "partie" id = "Ranked" onclick="qClasse()" style="height: 65px;"><h1 class = "btn" >Trouvage de partie ranked</h1></button>
+
+            <hr>
+            <h1 class = "gros">Privee</h1>
 
             <input type = "text" class ="txtCode" id = "txtCode" placeholder="Code">
+            <button class = "connecter" id = "chercher" onclick="qClasse()"><h1 class = "ptibtn">Rechercher</h1></button>
 
-            <button class = "matchmaking" id = "matchmaking" onclick="qPartie()">Trouvage de partie</button>
-            <button class = "Ranked" id = "Ranked" onclick="qClasse()">Trouvage de partie ranked</button>
+            <h1>Votre code : </h1><h1 id = "code">XXXX</h1>
+
+
 
         </div>
 
