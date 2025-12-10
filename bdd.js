@@ -8,7 +8,7 @@ let bdd;
 async function connexion() {
     if (bdd) return;
     bdd = await mysql.createConnection({
-        host: "10.187.52.4",
+        host: "localhost",
         user: "brissauda",
         password: "brissauda",
         database: "brissauda_b"
@@ -22,8 +22,7 @@ async function createUser(pseudo, mdp) {
     
     const [res] = await bdd.execute("INSERT INTO p4_joueurs (pseudo, password) VALUES (?, ?)", 
     [pseudo, mdp]);
-    await bdd.execute("INSERT INTO p4_elo (id_joueur, elo) VALUES (?, ?)", [res.insertId, 500]);
-    return res.pseudo;
+    await bdd.execute("INSERT INTO p4_elo (id_joueur) VALUES (?)", [res.insertId]);
 }
 
 async function getUser(pseudo) {
@@ -34,14 +33,15 @@ async function getUser(pseudo) {
 
 async function loginUser(pseudo, mdp) {
     const user = await getUser(pseudo);
-    if (!user) return { ok: false, msg: "Pseudo inconnu" };
-    if (user.password !== mdp) return { ok: false, msg: "Mot de passe incorrect" };
+    if (!user) throw { ok: false, msg: "Pseudo inconnu" };
+    if (user.password !== mdp) throw { ok: false, msg: "Mot de passe incorrect" };
     return { ok: true, user :user };
 }
 
 async function getElo(pseudo){
     const [rows]=await bdd.execute("SELECT elo FROM p4_elo JOIN p4_joueurs ON p4_joueurs.id=p4_elo.id_joueur WHERE p4_joueurs.pseudo=?",
     [pseudo]);
+    if (!rows[0]) throw {code : "ERR echec getElo"};
     return rows[0].elo;
 }
 

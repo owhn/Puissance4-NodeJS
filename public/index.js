@@ -29,6 +29,12 @@ socket.on("setLocalPlayerID",(data)=>{
 
 function test(){
     creerCompte();
+
+}
+let pseudo,mdp;
+function test2(){
+    console.log(joueur.pseudo + " " + joueur.elo);
+    console.log(joueur.localPlayerID);
 }
 
 function connexionCompte(){
@@ -50,15 +56,15 @@ socket.on("login_ok", (data)=>{
 
 function creerCompte(){
     // console.log("creerCompte");
-    let pseudo=document.getElementById("txtPseudo");//ajt .value qd créé
-    let mdp=document.getElementById("txtMdp");//ajt .value qd créé
-    pseudo="congo";
-    mdp="loco";
+    // let pseudo=document.getElementById("txtPseudo");//ajt .value qd créé
+    // let mdp=document.getElementById("txtMdp");//ajt .value qd créé
+    pseudo="12";
+    mdp="123";
     socket.emit("creerCompte",{pseudo,mdp});    
 }
 
-socket.on("register_ok",(data)=>{
-    console.log("création de compte OK !");
+socket.on("register_ok", (data)=>{
+    console.log("création de compte OK ! : " +data.pseudo + " " + data.mdp);
     connexionCompte(data.pseudo,data.mdp);
 });
 

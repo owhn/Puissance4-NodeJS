@@ -60,28 +60,27 @@ io.on("connection", (socket) => {
             const result = await bdd.loginUser(data.pseudo,data.mdp);
             console.log("after bdd.loginUser");
             if(!result.ok){
-                socket.emit("erreurBDD", result.msg);
+                socket.emit("erreurBDD", "login pas ok");
             }
             else if (result.ok){
                 const elo = await bdd.getElo(data.pseudo);
-                socket.emit("login_ok", {pseudo : result.user.pseudo, elo});
-                let msg="login ok";
-                console.log(msg + " elseif");
+                socket.emit("login_ok", {pseudo : data.pseudo, elo});
+                console.log("login_ok");
             }
         }catch(e){
-            socket.emit("erreurBDD", "erreur BDD");
+            socket.emit("erreurBDD", e);
         }
     });
     
     socket.on("creerCompte", async (data)=>{
-        console.log("creerCompte p/m : " + data.pseudo + " " + data.mdp);
+        console.log("creerCompte pseudo : " + data.pseudo + " mdp : " + data.mdp);
         try {
-            let returned = await bdd.createUser(data.pseudo, data.mdp);
-            console.log("username : " + returned);
-            let elo = await bdd.getElo();
-            socket.emit("register_ok", {pseudo : data.pseudo, elo});
+            await bdd.createUser(data.pseudo, data.mdp);
+            socket.emit("register_ok", {pseudo : data.pseudo, mdp : data.mdp});
+            console.log("register_ok");
         } catch (e) {
-            socket.emit("erreurBDD", "Pseudo déjà pris");
+            console.log("catch creerCompte");
+            socket.emit("erreurBDD", e);
         }
     });
 
