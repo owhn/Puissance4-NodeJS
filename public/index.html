@@ -15,13 +15,13 @@
         ////////////////////////////////////////////////////////////////////////////////////
         /////////////////////////////////////////////////////////////////////////////////-->
 
-            <div class = "zone_menu" >
+        <div class = "zone_menu" >
                 <blockquote id = "blockConnect"  >
                     <h1 class = "gros">Connexion</h1>
                     <h1>Votre pseudo : </h1> 
                     <input type = "text" class ="txtPseudo" id = "txtPseudo" placeholder="Pseudo">
                     <h1>Votre mot de passe : </h1> 
-                    <input type = "text" class ="txtMdp" id = "txtMdp" placeholder="Mot de Passe">
+                    <input type = "password" class ="txtMdp" id = "txtMdp" placeholder="Mot de Passe">
                     <button class = "connecter" id = "connecter" ><h1 class = "ptibtn">Se Connecter</h1></button>
                     <button class = "connecter" id = "creerCompte" ><h1 class = "ptibtn">Creer un compte</h1></button>
     
@@ -36,7 +36,6 @@
 
                 <blockquote id ="dansPartie" hidden >
                     <button class = "quitter" id = "quitPartie" ><h1 class = "btn">Quitter la partie</h1></button>
-    
     
                 </blockquote>
     
@@ -55,7 +54,7 @@
                 <h1>Votre code : </h1><h1 id = "code">XXXX</h1>
 
 
-            </div>
+        </div>
 
         <!--////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////
@@ -72,6 +71,29 @@
         /////////////////////////////////////////////////////////////////////////////////-->
 
         <div class = "zone-plateau">
+            <button class = "btnTheme" id = "btnTheme" onclick="chTheme()"></button>
+            <blockquote class = "blockTheme" id = "blockTheme" hidden>
+                <h1 class ="textTheme">Theme : </h1> 
+                <select class ="theme" id="theme">
+                  <option value="spider" selected="selected">SPIDER-MAN</option>
+                  <option value="bk" >Booba - Kaaris</option>
+                  <option value="gf" >George Floyd</option>
+                </select>
+            </blockquote>
+
+            <div class ="buttons" id="buttons">
+
+                <input type="button" id="colonneA" class="colonne" onclick="colChoix(0,9)">
+                <input type="button" id="colonneB" class="colonne" onclick="colChoix(1,125)">
+                <input type="button" id="colonneC" class="colonne" onclick="colChoix(2,241)">
+                <input type="button" id="colonneD" class="colonne" onclick="colChoix(3,357)">
+                <input type="button" id="colonneE" class="colonne" onclick="colChoix(4,473)">
+                <input type="button" id="colonneF" class="colonne" onclick="colChoix(5,589)">
+                <input type="button" id="colonneG" class="colonne" onclick="colChoix(6,705)">
+
+            </div>
+
+
 
             <div class="board" id="plateau">
                 <!-- Ligne 1 -->
