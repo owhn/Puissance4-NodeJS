@@ -8,7 +8,7 @@ let bdd;
 async function connexion() {
     if (bdd) return;
     bdd = await mysql.createConnection({
-        host: "localhost",
+        host: "10.187.52.4",
         user: "brissauda",
         password: "brissauda",
         database: "brissauda_b"

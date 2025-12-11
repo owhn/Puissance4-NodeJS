@@ -3,17 +3,106 @@
  Ici tu fais le html (évidemment) et tu lies les fonctions du index.js à des boutons etc...
 -->
 
-
 <!DOCTYPE html>
 <html>
     <head>
         <title>Puissance 4</title>
+        <link rel="stylesheet" href="style.css"/>
+
     </head>
-    <body>
-        <h1>XXX</h1>
-        <button id="x" onclick="test()">1</button>
-        <button id="e" onclick="test2()">2</button>
+    <body id = "pp">
+        <!--////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////-->
+
+            <div class = "zone_menu" >
+                <blockquote id = "blockConnect"  >
+                    <h1 class = "gros">Connexion</h1>
+                    <h1>Votre pseudo : </h1> 
+                    <input type = "text" class ="txtPseudo" id = "txtPseudo" placeholder="Pseudo">
+                    <h1>Votre mot de passe : </h1> 
+                    <input type = "text" class ="txtMdp" id = "txtMdp" placeholder="Mot de Passe">
+                    <button class = "connecter" id = "connecter" onclick="connexionCompte()"><h1 class = "ptibtn">Se Connecter</h1></button>
+                    <button class = "connecter" id = "creerCompte" onclick="creerCompte()"><h1 class = "ptibtn">Creer un compte</h1></button>
+                </blockquote>
+    
+                <blockquote id = "deconnect" hidden >
+                    <h1>Pseudo : </h1><h1 id = "pseudo">XXXX</h1>
+    
+                    <button class = "deconnecter" id = "seDeconnecter" ><h1 class = "btn">Se deconnecter</h1></button>
+    
+                </blockquote>
+
+                <blockquote id ="dansPartie" hidden >
+                    <button class = "quitter" id = "quitPartie" ><h1 class = "btn">Quitter la partie</h1></button>
+    
+    
+                </blockquote>
+    
+                <hr>
+                <h1 class = "gros">Partie</h1>
+    
+                <button class = "partie" id = "matchmaking" onclick="qPartie()"><h1 class = "btn">Trouvage de partie</h1></button>
+                <button class = "partie" id = "Ranked" onclick="qClasse()" style="height: 65px;"><h1 class = "btn" >Trouvage de partie ranked</h1></button>
+    
+                <hr>
+                <h1 class = "gros">Privee</h1>
+    
+                <input type = "text" class ="txtCode" id = "txtCode" placeholder="Code">
+                <button class = "connecter" id = "chercher" onclick="qClasse()"><h1 class = "ptibtn">Rechercher</h1></button>
+    
+                <h1>Votre code : </h1><h1 id = "code">XXXX</h1>
+
+
+            </div>
+
+        <!--////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////-->
+
+
+        <button class = "Abandon" id = "Abandon" onclick="abandon()">Abandonner</button>
+
+        <button class = "reset" id = "reset" onclick="reset()">Reset</button>
+
+
+        <!--////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////-->
+
+        <div class = "zone-plateau">
+
+            <div class="board" id="plateau">
+                <!-- Ligne 1 -->
+                <div id="A1" class="zone-jeton"></div><div id="B1" class="zone-jeton"></div><div id="C1" class="zone-jeton"></div><div id="D1" class="zone-jeton"></div><div id="E1" class="zone-jeton"></div><div id="F1" class="zone-jeton"></div><div id="G1" class="zone-jeton"></div>
+        
+                <!-- Ligne 2 -->
+                <div id="A2" class="zone-jeton"></div><div id="B2" class="zone-jeton"></div><div id="C2" class="zone-jeton"></div><div id="D2" class="zone-jeton"></div><div id="E2" class="zone-jeton"></div><div id="F2" class="zone-jeton"></div><div id="G2" class="zone-jeton"></div>
+        
+                <!-- Ligne 3 -->
+                <div id="A3" class="zone-jeton"></div><div id="B3" class="zone-jeton"></div><div id="C3" class="zone-jeton"></div><div id="D3" class="zone-jeton"></div><div id="E3" class="zone-jeton"></div><div id="F3" class="zone-jeton"></div><div id="G3" class="zone-jeton"></div>
+        
+                <!-- Ligne 4 -->
+                <div id="A4" class="zone-jeton"></div><div id="B4" class="zone-jeton"></div><div id="C4" class="zone-jeton"></div><div id="D4" class="zone-jeton"></div><div id="E4" class="zone-jeton"></div><div id="F4" class="zone-jeton"></div><div id="G4" class="zone-jeton"></div>
+        
+                <!-- Ligne 5 -->
+                <div id="A5" class="zone-jeton"></div><div id="B5" class="zone-jeton"></div><div id="C5" class="zone-jeton"></div><div id="D5" class="zone-jeton"></div><div id="E5" class="zone-jeton"></div><div id="F5" class="zone-jeton"></div><div id="G5" class="zone-jeton"></div>
+        
+                <!-- Ligne 6 -->
+                <div id="A6" class="zone-jeton"></div><div id="B6" class="zone-jeton"></div><div id="C6" class="zone-jeton"></div><div id="D6" class="zone-jeton"></div><div id="E6" class="zone-jeton"></div><div id="F6" class="zone-jeton"></div><div id="G6" class="zone-jeton"></div>
+            </div>
+        </div>
+
+        <!--////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////-->
+
+
+
+
         <script src="/socket.io/socket.io.js"></script>
         <script src="index.js"></script>
+        <script src="styleClient.js"></script>
+
     </body>
 </html>

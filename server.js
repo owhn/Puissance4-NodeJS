@@ -17,10 +17,11 @@ const io = socket(server); //Initialisation de socket.io
 const rooms = {
     joueurs: [],
     IDs: [],
+    elo: [],
     votes: [],
     turn: 0,
     board: creerTabVide()
-}; //rooms[roomID] = {joueurs = [socketID(j1), socketID(j2)] , ID = [IDs dans bdd]}
+}; //rooms[roomID] = {joueurs = [pseudoJ1, pseudoJ2] , ID = [localPlayerIDs]}
 
 const privateRooms = {
     joueurs: [],
@@ -30,8 +31,8 @@ const privateRooms = {
     board: creerTabVide()
 }; 
 
-const rankedQueue = [];// joueur : {socketID, elo}
-const queue = [];// socketID
+let rankedQueue = [];// joueur : {socketID, elo}
+let queue = [];// socketID
 
 function creerTabVide(){
     return [
@@ -44,7 +45,13 @@ function creerTabVide(){
         ];
 }
 
-
+function genRoomID() {
+    let id;
+    do {
+        id = "room" + Math.floor(Math.random() * 1000000);
+    } while (rooms[id]); // ça boucle tant que l'id existe déjà
+    return id;
+}
 
 
 io.on("connection", (socket) => {
@@ -84,14 +91,78 @@ io.on("connection", (socket) => {
         }
     });
 
-    socket.on("queue",(data)=>{
+    socket.on("queue",(localPlayerID)=>{
+        if(rankedQueue.includes(localPlayerID)){
+            rankedQueue = rankedQueue.filter(id => id !== localPlayerID);
+        }
 
+        if(queue.includes(localPlayerID)) return;        
 
+        queue.push(localPlayerID);
+        console.log("longueur de la queue : "+queue.length+"cm");
 
+        if (queue.length >= 2){
+            let roomID = genRoomID();
+            io.to(queue.shift()).emit("sendRoom", roomID);
+            io.to(queue.shift()).emit("sendRoom", roomID);
+        }
     });
 
+    socket.on("joinRoom", (data)=>{
+        socket.join(data.roomID);
 
+        if(!rooms[data.roomID]){
+            rooms[data.roomID] = {
+                joueurs: [],
+                IDs: [],
+                elo: [],
+                votes: [],
+                turn: 0,
+                board: creerTabVide()
+            };
+        }
+        rooms[data.roomID].joueurs.push(data.pseudo);
+        rooms[data.roomID].IDs.push(data.localPlayerID);
+        
+        //console.log("Room", data.roomID, rooms[data.roomID]);
+    });
 
+    socket.on("rankedQueue",(localPlayerID)=>{
+        if(queue.includes(localPlayerID)){
+            queue = queue.filter(id => id !== localPlayerID);
+        }
+
+        if(rankedQueue.includes(localPlayerID)) return;
+                
+        rankedQueue.push(localPlayerID);
+        console.log("longueur de la queue : "+rankedQueue.length+"cm");
+
+        if (rankedQueue.length >= 2){
+            let roomID = genRoomID();
+            io.to(rankedQueue.shift()).emit("sendRoomRanked", roomID);
+            io.to(rankedQueue.shift()).emit("sendRoomRanked", roomID);
+        }
+    });
+
+    socket.on("joinRoomRanked", (data)=>{
+        socket.join(data.roomID);
+
+        if(!rooms[data.roomID]){
+            rooms[data.roomID] = {
+                joueurs: [],
+                IDs: [],
+                elo: [],
+                votes: [],
+                turn: 0,
+                board: creerTabVide()
+            };
+        }
+        rooms[data.roomID].joueurs.push(data.pseudo);
+        rooms[data.roomID].IDs.push(data.localPlayerID);
+        rooms[data.roomID].elo.push(data.elo);
+        
+        //console.log("Room", data.roomID, rooms[data.roomID]);
+    });
 
     
 
