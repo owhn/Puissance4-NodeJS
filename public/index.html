@@ -16,7 +16,7 @@
         /////////////////////////////////////////////////////////////////////////////////-->
 
         <div class = "zone_menu" >
-                <blockquote id = "blockConnect"  >
+                <blockquote id = "blockConnect" hidden >
                     <h1 class = "gros">Connexion</h1>
                     <h1>Votre pseudo : </h1> 
                     <input type = "text" class ="txtPseudo" id = "txtPseudo" placeholder="Pseudo">
@@ -27,31 +27,52 @@
     
                 </blockquote>
     
-                <blockquote id = "deconnect" hidden >
+                <blockquote id = "deconnect"  >
                     <h1>Pseudo : </h1><h1 id = "pseudo">XXXX</h1>
+                    <button id = "btnTheme" class="btnTheme" onclick="chPseudo()"></button>
+
     
                     <button class = "deconnecter" id = "seDeconnecter" ><h1 class = "btn">Se deconnecter</h1></button>
     
+                </blockquote>
+
+                <blockquote id = "modifCompte" hidden>
+                    <h1 class = "gros">Modification</h1>
+                    <h1>Pseudo Actuel : </h1> 
+                    <input type = "text" class ="txtPseudo" id = "txtPseudo" placeholder="Pseudo">
+                    <h1>Mot de passe actuel : </h1> 
+                    <input type = "password" class ="txtMdp" id = "txtMdp" placeholder="Mot de Passe">
+
+                    <hr>
+
+                    <h1>Nouveau pseudo : </h1> 
+                    <input type = "text" class ="txtPseudo" id = "newPseudo" placeholder="Pseudo">
+                    <h1>Nouveau mot de passe : </h1> 
+                    <input type = "password" class ="txtMdp" id = "newMdp" placeholder="Mot de Passe">
+
+                    <button class = "connecter" id = "valider" ><h1 class = "ptibtn">Valider</h1></button>
+                    <button class = "connecter" id = "annuler" style="background-color: #e22525;" onclick="retour()"><h1 class = "ptibtn">Annuler</h1></button>
                 </blockquote>
 
                 <blockquote id ="dansPartie" hidden >
                     <button class = "quitter" id = "quitPartie" ><h1 class = "btn">Quitter la partie</h1></button>
     
                 </blockquote>
-    
-                <hr>
-                <h1 class = "gros">Partie</h1>
-    
-                <button class = "partie" id = "matchmaking" onclick="qPartie()"><h1 class = "btn">Trouvage de partie</h1></button>
-                <button class = "partie" id = "Ranked" onclick="qClasse()" style="height: 65px;"><h1 class = "btn" >Trouvage de partie ranked</h1></button>
-    
-                <hr>
-                <h1 class = "gros">Privee</h1>
-    
-                <input type = "text" class ="txtCode" id = "txtCode" placeholder="Code">
-                <button class = "connecter" id = "chercher" onclick="qClasse()"><h1 class = "ptibtn">Rechercher</h1></button>
-    
-                <h1>Votre code : </h1><h1 id = "code">XXXX</h1>
+                <blockquote id="partieG">
+                    <hr>
+                    <h1 class = "gros">Partie</h1>
+        
+                    <button class = "partie" id = "matchmaking" onclick="qPartie()"><h1 class = "btn">Trouvage de partie</h1></button>
+                    <button class = "partie" id = "Ranked" onclick="qClasse()" style="height: 65px;"><h1 class = "btn" >Trouvage de partie ranked</h1></button>
+        
+                    <hr>
+                    <h1 class = "gros">Privee</h1>
+        
+                    <input type = "text" class ="txtCode" id = "txtCode" placeholder="Code">
+                    <button class = "connecter" id = "chercher" onclick="qClasse()"><h1 class = "ptibtn">Rechercher</h1></button>
+        
+                    <h1>Votre code : </h1><h1 id = "code">XXXX</h1>
+                </blockquote>
 
 
         </div>
@@ -61,9 +82,7 @@
         /////////////////////////////////////////////////////////////////////////////////-->
 
 
-        <button class = "Abandon" id = "Abandon" onclick="abandon()">Abandonner</button>
 
-        <button class = "reset" id = "reset" onclick="reset()">Reset</button>
 
 
         <!--////////////////////////////////////////////////////////////////////////////////
@@ -71,15 +90,7 @@
         /////////////////////////////////////////////////////////////////////////////////-->
 
         <div class = "zone-plateau">
-            <button class = "btnTheme" id = "btnTheme" onclick="chTheme()"></button>
-            <blockquote class = "blockTheme" id = "blockTheme" hidden>
-                <h1 class ="textTheme">Theme : </h1> 
-                <select class ="theme" id="theme">
-                  <option value="spider" selected="selected">SPIDER-MAN</option>
-                  <option value="bk" >Booba - Kaaris</option>
-                  <option value="gf" >George Floyd</option>
-                </select>
-            </blockquote>
+
 
             <div class ="buttons" id="buttons">
 
@@ -120,6 +131,53 @@
         ////////////////////////////////////////////////////////////////////////////////////
         /////////////////////////////////////////////////////////////////////////////////-->
 
+    <div class = "zone_droite" >
+        <blockquote class = "classement">
+            <!--<button id ="afClassement" class ="afClassement" > <h1 id = "classement"><img src="podium.png" alt="img" width="30" height="30" > &nbsp; Classement</h1></button>-->
+
+            <h1 id = "classement"><img src="podium.png" alt="img" width="30" height="30" > &nbsp; Classement</h1>
+            <h1 class = "top">
+                <h1 id = "t1">1 - </h1>
+                <h1 id = "t2">2 - </h1>
+                <h1 id = "t3">3 - </h1>
+                <h1 id = "t4">4 - </h1>
+                <h1 id = "t5">5 - </h1>
+
+            </h1>
+            
+        </blockquote>
+        <blockquote class ="jpartieClasse">
+            <h1 id ="infoJ1">Joueur 1 : XXX 🏆</h1>
+            <h1 id ="infoJ1">Joueur 2 : XXX 🏆</h1>
+        </blockquote>
+        <blockquote class ="jpartie">
+            <h1 id ="infoJ1">Joueur 1 </h1>
+            <h1 id ="infoJ1">Joueur 2 </h1>
+        </blockquote>
+
+        <blockquote class ="blockTheme">
+            
+            <h1 class ="textTheme">Theme : </h1> 
+            <select class ="theme" id="theme">
+              <option value="spider" selected="selected">SPIDER-MAN</option>
+              <option value="bk" >Booba - Kaaris</option>
+              <option value="gf" >George Floyd</option>
+            </select>
+        </blockquote>
+
+
+
+
+
+        <button class = "Abandon" id = "Abandon" onclick="abandon()"><h1 class ="ptibtn">Abandonner</h1></button>
+
+        <button class = "reset" id = "reset" onclick="reset()"><h1 class ="ptibtn">Reset</h1></button>
+
+    </div>
+
+        <!--////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////-->
 
 
 
