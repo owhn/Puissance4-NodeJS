@@ -17,10 +17,11 @@ const io = socket(server); //Initialisation de socket.io
 const rooms = {
     joueurs: [],
     IDs: [],
+    elo: [],
     votes: [],
     turn: 0,
     board: creerTabVide()
-}; //rooms[roomID] = {joueurs = [socketID(j1), socketID(j2)] , ID = [IDs dans bdd]}
+}; //rooms[roomID] = {joueurs = [pseudoJ1, pseudoJ2] , ID = [localPlayerIDs]}
 
 const privateRooms = {
     joueurs: [],
@@ -30,8 +31,8 @@ const privateRooms = {
     board: creerTabVide()
 }; 
 
-const rankedQueue = [];// joueur : {socketID, elo}
-const queue = [];// socketID
+let rankedQueue = [];// joueur : {socketID, elo,timestamp:Date.now()}
+let queue = [];// socketID
 
 function creerTabVide(){
     return [
@@ -44,7 +45,13 @@ function creerTabVide(){
         ];
 }
 
-
+function genRoomID() {
+    let id;
+    do {
+        id = "room" + Math.floor(Math.random() * 1000000);
+    } while (rooms[id]); // ça boucle tant que l'id existe déjà
+    return id;
+}
 
 
 io.on("connection", (socket) => {
@@ -60,45 +67,130 @@ io.on("connection", (socket) => {
             const result = await bdd.loginUser(data.pseudo,data.mdp);
             console.log("after bdd.loginUser");
             if(!result.ok){
-                socket.emit("erreurBDD", result.msg);
+                socket.emit("erreurBDD", "login pas ok");
             }
             else if (result.ok){
                 const elo = await bdd.getElo(data.pseudo);
-                socket.emit("login_ok", {pseudo : result.user.pseudo, elo});
-                let msg="login ok";
-                console.log(msg + " elseif");
+                socket.emit("login_ok", {pseudo : data.pseudo, elo});
+                console.log("login_ok");
             }
         }catch(e){
-            socket.emit("erreurBDD", "erreur BDD");
+            socket.emit("erreurBDD", e);
         }
     });
     
     socket.on("creerCompte", async (data)=>{
-        console.log("creerCompte p/m : " + data.pseudo + " " + data.mdp);
+        console.log("creerCompte pseudo : " + data.pseudo + " mdp : " + data.mdp);
         try {
-            let returned = await bdd.createUser(data.pseudo, data.mdp);
-            console.log("username : " + returned);
-            let elo = await bdd.getElo();
-            socket.emit("register_ok", {pseudo : data.pseudo, elo});
+            await bdd.createUser(data.pseudo, data.mdp);
+            socket.emit("register_ok", {pseudo : data.pseudo, mdp : data.mdp});
+            console.log("register_ok");
         } catch (e) {
-            socket.emit("erreurBDD", "Pseudo déjà pris");
+            console.log("catch creerCompte");
+            socket.emit("erreurBDD", e);
         }
     });
 
-    socket.on("queue",(data)=>{
+    socket.on("queue",(localPlayerID)=>{
+        if(rankedQueue.includes(localPlayerID)){
+            rankedQueue = rankedQueue.filter(id => id !== localPlayerID);
+        }
 
+        if(queue.includes(localPlayerID)) return;        
 
+        queue.push(localPlayerID);
+        console.log("longueur de la queue : "+queue.length+"cm");
 
+        if (queue.length >= 2){
+            let roomID = genRoomID();
+            io.to(queue.shift()).emit("sendRoom", roomID);
+            io.to(queue.shift()).emit("sendRoom", roomID);
+        }
     });
 
+    socket.on("joinRoom", (data)=>{
+        socket.join(data.roomID);
 
+        if(!rooms[data.roomID]){
+            rooms[data.roomID] = {
+                joueurs: [],
+                IDs: [],
+                elo: [],
+                votes: [],
+                turn: 0,
+                board: creerTabVide()
+            };
+        }
+        rooms[data.roomID].joueurs.push(data.pseudo);
+        rooms[data.roomID].IDs.push(data.localPlayerID);
+        
+        //console.log("Room", data.roomID, rooms[data.roomID]);
+    });
 
+    socket.on("rankedQueue",(data)=>{
+        if(queue.includes(data.localPlayerID)){
+            queue = queue.filter(id => id !== data.localPlayerID);
+        }
+
+        if(rankedQueue.includes(data.localPlayerID)) return;
+                
+        rankedQueue.push({
+            socketID: data.localPlayerID,
+            elo: data.elo,
+            timeJoined: Date.now()
+        });
+        console.log("longueur de la queue : "+rankedQueue.length+"cm");
+    });
+
+    socket.on("joinRoomRanked", (data)=>{
+        socket.join(data.roomID);
+
+        if(!rooms[data.roomID]){
+            rooms[data.roomID] = {
+                joueurs: [],
+                IDs: [],
+                elo: [],
+                votes: [],
+                turn: 0,
+                board: creerTabVide()
+            };
+        }
+        rooms[data.roomID].joueurs.push(data.pseudo);
+        rooms[data.roomID].IDs.push(data.localPlayerID);
+        rooms[data.roomID].elo.push(data.elo);
+        
+        //console.log("Room", data.roomID, rooms[data.roomID]);
+    });
 
     
 
 });
 
+function matchmakingRanked(){
+    if (queue.length < 2) return;
 
+    queue.sort((a, b) => a.elo - b.elo);
+
+    for (let i = 0; i < queue.length - 1; i++) {
+        let j1=rankedQueue[i];
+        let j2=rankedQueue[i+1];
+
+        //temps d'attente en sec
+        tempsAttendu1=(Date.now() - p1.timeJoined) / 1000;
+        tempsAttendu2=(Date.now() - p2.timeJoined) / 1000;
+
+        //range de matchmaking de base : 50
+        let range1=50+(tempsAttendu1/2);
+        let range2=50+(tempsAttendu2/2);
+        
+        if (p2.elo-p1.elo >= range1 || p2.elo-p1.elo >= range2){
+            socket.to(p1.socketID).emit("senRoomRanked");
+            socket.to(p2.socketID).emit("senRoomRanked");
+        }
+    }
+}
+
+setInterval(matchmakingRanked(), 1000);
 
 async function Demarrage(){
     await bdd.connexion();
