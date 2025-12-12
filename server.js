@@ -31,7 +31,7 @@ const privateRooms = {
     board: creerTabVide()
 }; 
 
-let rankedQueue = [];// joueur : {socketID, elo}
+let rankedQueue = [];// joueur : {socketID, elo,timestamp:Date.now()}
 let queue = [];// socketID
 
 function creerTabVide(){
@@ -127,21 +127,19 @@ io.on("connection", (socket) => {
         //console.log("Room", data.roomID, rooms[data.roomID]);
     });
 
-    socket.on("rankedQueue",(localPlayerID)=>{
-        if(queue.includes(localPlayerID)){
-            queue = queue.filter(id => id !== localPlayerID);
+    socket.on("rankedQueue",(data)=>{
+        if(queue.includes(data.localPlayerID)){
+            queue = queue.filter(id => id !== data.localPlayerID);
         }
 
-        if(rankedQueue.includes(localPlayerID)) return;
+        if(rankedQueue.includes(data.localPlayerID)) return;
                 
-        rankedQueue.push(localPlayerID);
+        rankedQueue.push({
+            socketID: data.localPlayerID,
+            elo: data.elo,
+            timeJoined: Date.now()
+        });
         console.log("longueur de la queue : "+rankedQueue.length+"cm");
-
-        if (rankedQueue.length >= 2){
-            let roomID = genRoomID();
-            io.to(rankedQueue.shift()).emit("sendRoomRanked", roomID);
-            io.to(rankedQueue.shift()).emit("sendRoomRanked", roomID);
-        }
     });
 
     socket.on("joinRoomRanked", (data)=>{
@@ -168,7 +166,27 @@ io.on("connection", (socket) => {
 
 });
 
+function matchmakingRanked(){
+    if (queue.length < 2) return;
 
+    queue.sort((a, b) => a.elo - b.elo);
+
+    for (let i = 0; i < queue.length - 1; i++) {
+        let j1=rankedQueue[i];
+        let j2=rankedQueue[i+1];
+
+        //temps d'attente en sec
+        tempsAttendu1=(Date.now() - p1.timeJoined) / 1000;
+        tempsAttendu2=(Date.now() - p2.timeJoined) / 1000;
+
+        //range de matchmaking de base : 50
+        let range1=50+(tempsAttendu1/2);
+        let range2=50+(tempsAttendu2/2);
+        
+    }
+}
+
+setInterval(matchmakingRanked(), 1000);
 
 async function Demarrage(){
     await bdd.connexion();

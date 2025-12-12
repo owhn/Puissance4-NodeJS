@@ -72,7 +72,7 @@ function qPartie(){
 
 socket.on("sendRoom", (data) => {
     roomID=data;
-    console.log("sendRoom : "+roomID);
+    console.log("sendRoom : " + roomID);
     socket.emit("joinRoom", {
         roomID,
         pseudo : joueur.pseudo,
@@ -81,13 +81,12 @@ socket.on("sendRoom", (data) => {
 });
 
 function qClasse(){
-    socket.emit("rankedQueue",(joueur.localPlayerID));
-
+    socket.emit("rankedQueue",{localPlayerID: joueur.localPlayerID, elo: joueur.elo});
 }
 
 socket.on("sendRoomRanked", (data) => {
     roomID=data;
-    console.log("sendRoom : "+roomID);
+    console.log("sendRoomRanked : " + roomID);
     socket.emit("joinRoomRanked", {
         roomID,
         pseudo : joueur.pseudo,
