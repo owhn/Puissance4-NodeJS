@@ -2,6 +2,7 @@
 //Je vais mettre ici toutes les fonctions (pour les boutons) que tu lieras au html, on associera le styleClient.js à ce fichier*
 
 let roomID;
+let pseudo,mdp;
 
 const joueur = {
     localPlayerID: "",
@@ -25,16 +26,12 @@ socket.on("setLocalPlayerID",(data)=>{
 
 
 
-
-
-function test(){
-    creerCompte();
-}
+//BDD :
 
 function connexionCompte(){
     // console.log("connexionCompte");
-    // let pseudo=document.getElementById("txtPseudo");//ajt .value qd créé
-    // let mdp=document.getElementById("txtMdp");//ajt .value qd créé
+    pseudo=document.getElementById("txtPseudo").value;//ajt .value qd créé
+    mdp=document.getElementById("txtMdp").value;//ajt .value qd créé
     // pseudo="zozo";
     // mdp="cawe";
     socket.emit("connexionCompte",{pseudo,mdp});
@@ -44,21 +41,21 @@ socket.on("login_ok", (data)=>{
     joueur.pseudo=data.pseudo;
     joueur.elo=data.elo;
     console.log("login ok : "+data.pseudo+ " " + data.elo);
-    document.getElementById("x").textContent=joueur.pseudo;
+    document.getElementById("pseudo").textContent=joueur.pseudo;
 
 });
 
 function creerCompte(){
     // console.log("creerCompte");
-    let pseudo=document.getElementById("txtPseudo");//ajt .value qd créé
-    let mdp=document.getElementById("txtMdp");//ajt .value qd créé
-    pseudo="congo";
-    mdp="loco";
+     pseudo=document.getElementById("txtPseudo").value;//ajt .value qd créé
+     mdp=document.getElementById("txtMdp").value;//ajt .value qd créé
+    // pseudo="12";
+    // mdp="123";
     socket.emit("creerCompte",{pseudo,mdp});    
 }
 
-socket.on("register_ok",(data)=>{
-    console.log("création de compte OK !");
+socket.on("register_ok", (data)=>{
+    console.log("création de compte OK ! : " +data.pseudo + " " + data.mdp);
     connexionCompte(data.pseudo,data.mdp);
 });
 
@@ -66,13 +63,37 @@ socket.on("erreurBDD",(msg)=>{
     console.log(msg);
 });
 
-function qPartie(){
 
+//Matchmaking :
+
+function qPartie(){
+    socket.emit("queue",(joueur.localPlayerID));
 }
+
+socket.on("sendRoom", (data) => {
+    roomID=data;
+    console.log("sendRoom : " + roomID);
+    socket.emit("joinRoom", {
+        roomID,
+        pseudo : joueur.pseudo,
+        localPlayerID : joueur.localPlayerID
+    });
+});
 
 function qClasse(){
-
+    socket.emit("rankedQueue",{localPlayerID: joueur.localPlayerID, elo: joueur.elo});
 }
+
+socket.on("sendRoomRanked", (data) => {
+    roomID=data;
+    console.log("sendRoomRanked : " + roomID);
+    socket.emit("joinRoomRanked", {
+        roomID,
+        pseudo : joueur.pseudo,
+        localPlayerID : joueur.localPlayerID,
+        elo : joueur.elo
+    });
+});
 
 function abandon(){
 
