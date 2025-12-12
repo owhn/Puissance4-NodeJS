@@ -183,6 +183,10 @@ function matchmakingRanked(){
         let range1=50+(tempsAttendu1/2);
         let range2=50+(tempsAttendu2/2);
         
+        if (p2.elo-p1.elo >= range1 || p2.elo-p1.elo >= range2){
+            socket.to(p1.socketID).emit("senRoomRanked");
+            socket.to(p2.socketID).emit("senRoomRanked");
+        }
     }
 }
 
