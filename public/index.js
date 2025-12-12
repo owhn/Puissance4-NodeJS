@@ -38,10 +38,13 @@ function connexionCompte(){
 }
 
 socket.on("login_ok", (data)=>{
+
     joueur.pseudo=data.pseudo;
     joueur.elo=data.elo;
     console.log("login ok : "+data.pseudo+ " " + data.elo);
     document.getElementById("pseudo").textContent=joueur.pseudo;
+    document.getElementById("blockConnect").hidden = true;
+    document.getElementById("deconnect").hidden = false
 
 });
 

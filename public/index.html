@@ -22,8 +22,8 @@
                     <input type = "text" class ="txtPseudo" id = "txtPseudo" placeholder="Pseudo">
                     <h1>Votre mot de passe : </h1> 
                     <input type = "password" class ="txtMdp" id = "txtMdp" placeholder="Mot de Passe">
-                    <button class = "connecter" id = "connecter" ><h1 class = "ptibtn">Se Connecter</h1></button>
-                    <button class = "connecter" id = "creerCompte" ><h1 class = "ptibtn">Creer un compte</h1></button>
+                    <button class = "connecter" id = "connecter" onclick="connexionCompte()"><h1 class = "ptibtn">Se Connecter</h1></button>
+                    <button class = "connecter" id = "creerCompte" onclick = "creerCompte()"><h1 class = "ptibtn">Creer un compte</h1></button>
     
                 </blockquote>
     
@@ -39,16 +39,17 @@
                 <blockquote id = "modifCompte" hidden>
                     <h1 class = "gros">Modification</h1>
                     <h1>Pseudo Actuel : </h1> 
-                    <input type = "text" class ="txtPseudo" id = "txtPseudo" placeholder="Pseudo">
+                    <input type = "text" class ="txtPseudo" id = "txtPseudoM" placeholder="Pseudo">
                     <h1>Mot de passe actuel : </h1> 
-                    <input type = "password" class ="txtMdp" id = "txtMdp" placeholder="Mot de Passe">
+                    <input type = "password" class ="txtMdp" id = "txtMdpM" placeholder="Mot de Passe">
 
                     <hr>
 
                     <h1>Nouveau pseudo : </h1> 
                     <input type = "text" class ="txtPseudo" id = "newPseudo" placeholder="Pseudo">
                     <h1>Nouveau mot de passe : </h1> 
-                    <input type = "password" class ="txtMdp" id = "newMdp" placeholder="Mot de Passe">
+                    <input type = "password" class ="txtMdp" id = "new
+                    Mdp" placeholder="Mot de Passe">
 
                     <button class = "connecter" id = "valider" ><h1 class = "ptibtn">Valider</h1></button>
                     <button class = "connecter" id = "annuler" style="background-color: #e22525;" onclick="retour()"><h1 class = "ptibtn">Annuler</h1></button>
