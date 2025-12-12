@@ -26,6 +26,10 @@ blockquote{
 ///////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////*/
 /*Menu gauche*/
+
+
+
+
 h1{
     color: #fcfcfc;
     font-family: "cartoon";
@@ -99,14 +103,19 @@ h1{
     text-align: center;
     border-radius: 20px / 20px;
     border: 0px;
-    box-shadow: inset 3px 3px 6px rgba(0,0,0,0.3);
+    box-shadow:  3px 3px 8px rgba(0,0,0,0.3);
     border: 2px solid #eeeeee;
-
+}
+.connecter:active {
+    /* Effet "bouton enfoncé" */
+    box-shadow: inset 3px 3px 8px rgba(0,0,0,0.4);
+    transform: translateY(2px);
 }
 
 /*Trucs de parties*/
 
 .partie{
+
     background-color: #56b6ff;
     display: block;
     width: 250px;
@@ -116,16 +125,15 @@ h1{
     text-align: center;
     border-radius: 20px / 20px;
     border: 0px;
-    box-shadow: inset 3px 3px 6px rgba(0,0,0,0.3);
+    box-shadow:  3px 3px 8px rgba(0,0,0,0.3);
     border: 2px solid #eeeeee;
+}
+.partie:active {
+    /* Effet "bouton enfoncé" */
+    box-shadow: inset 3px 3px 8px rgba(0,0,0,0.4);
+    transform: translateY(2px);
+}
 
-}
-button:active{
-    transform: translate(0px, 3px);
-    -webkit-transform: translate(0px, 3px);
-    border-bottom: 1px solid;
-    background-color: #65bcff;
-}
 
 .txtCode{
     background-color: #eeeeee;
@@ -178,12 +186,14 @@ button:active{
 /*Plateau(et autour proche)*/
 
 .zone-plateau {
-    position: absolute;
     flex-direction: column;
+
+    
+    display: flex;
+    
     align-items: center; 
     gap: 0px;              
     margin-top: -25px;
-    margin-left: 550px
 }
 
 .board {
@@ -192,6 +202,7 @@ button:active{
     height: 720px;
     margin: 0px auto;
     margin-top:142px;
+  
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     grid-template-rows: repeat(6, 1fr);
@@ -249,8 +260,6 @@ button:active{
     border-color: white;
   }
 
-<<<<<<< Updated upstream
-=======
 /*Boutons*/
 .colonne{
     position: relative;
@@ -260,14 +269,11 @@ button:active{
     background-color: transparent;
     border: transparent;
 }
-.colonne:hover{
-    background:transparent url("gf.png");
-    /*opacity: 20%;*/
-    background-size: 110px;
-    background-repeat: no-repeat;
-    background-position-y: 30px;
-}
 
+.colonne:hover{
+    background-color: grey;
+    opacity: 10%;
+}
 
 
 /*/////////////////////////////////////////////////////////////////////////////////
@@ -405,7 +411,6 @@ button:active{
     transform: translateY(2px);
 }
 
->>>>>>> Stashed changes
 /*/////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////*/
