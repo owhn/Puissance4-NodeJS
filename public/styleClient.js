@@ -27,3 +27,5 @@ function retour(){
     blockpartie.hidden =false;
     blockmodif.hidden = true;
 }
+
+
