@@ -7,7 +7,7 @@ let pseudo,mdp;
 const joueur = {
     localPlayerID: "",
     pseudo: "",
-    elo: 500
+    elo: 0
 };
 
 
@@ -20,7 +20,7 @@ socket.on('connect', (data) => {
 socket.on("setLocalPlayerID",(data)=>{
     joueur.localPlayerID=data;
     console.log("localPlayerID : " + joueur.localPlayerID);
-    joueur.pseudo="Guest("+joueur.localPlayerID.substring(15)+")";
+    joueur.pseudo="Invité("+joueur.localPlayerID.substring(15)+")";
     console.log(joueur.pseudo);
 })
 
@@ -56,7 +56,7 @@ function creerCompte(){
 
 socket.on("register_ok", (data)=>{
     console.log("création de compte OK ! : " +data.pseudo + " " + data.mdp);
-    connexionCompte(data.pseudo,data.mdp);
+    connexionCompte();
 });
 
 socket.on("erreurBDD",(msg)=>{
@@ -81,7 +81,10 @@ socket.on("sendRoom", (data) => {
 });
 
 function qClasse(){
-    socket.emit("rankedQueue",{localPlayerID: joueur.localPlayerID, elo: joueur.elo});
+    if(joueur.elo>0) socket.emit("rankedQueue",{localPlayerID: joueur.localPlayerID, elo: joueur.elo});
+    else {
+        document.getElementById("btnRanked").textContent="Se connecter pour jouer en ranked";
+    }
 }
 
 socket.on("sendRoomRanked", (data) => {
@@ -110,6 +113,6 @@ function joinRoom(code){
 
 
 
-function colChoix(col,pos){
-    socket.emit("choix", tabColonnes[col]);
+function colChoix(col){
+    socket.emit("choix", {col,roomID,});
 }

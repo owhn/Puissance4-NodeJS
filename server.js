@@ -128,8 +128,8 @@ io.on("connection", (socket) => {
     });
 
     socket.on("rankedQueue",(data)=>{
-        if(queue.includes(data.localPlayerID)){
-            queue = queue.filter(id => id !== data.localPlayerID);
+        if(rankedQueue.includes(data.localPlayerID)){
+            rankedQueue = rankedQueue.filter(id => id !== data.localPlayerID);
         }
 
         if(rankedQueue.includes(data.localPlayerID)) return;
@@ -139,7 +139,7 @@ io.on("connection", (socket) => {
             elo: data.elo,
             timeJoined: Date.now()
         });
-        console.log("longueur de la queue : "+rankedQueue.length+"cm");
+        console.log("longueur de la rankedQueue : "+rankedQueue.length+"cm");
     });
 
     socket.on("joinRoomRanked", (data)=>{
@@ -162,35 +162,102 @@ io.on("connection", (socket) => {
         //console.log("Room", data.roomID, rooms[data.roomID]);
     });
 
-    
+    socket.on("choix",(data)=>{
+        let room=rooms[data.roomID];
+        let col=data.col;
+        let charCol = ['A','B','C','D','E','F','G'];
+
+        if(!room) return;
+        let tab=room.board;
+        for(let i = 5; i >=0;i--){
+            if(tab[i][col]===0){
+                tab[i][col]=room.joueurs[room.turn];
+                io.to(data.roomID).emit("placement", {ligne: i+1})
+            }
+        }
+
+    });
 
 });
 
+function checkWin(tab, joueur) {
+    const ROWS = 6;
+    const COLS = 7;
+
+    for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+
+            if (tab[r][c] !== joueur) continue;
+
+            // Horizontal →
+            if (c + 3 < COLS &&
+                tab[r][c + 1] === joueur &&
+                tab[r][c + 2] === joueur &&
+                tab[r][c + 3] === joueur) {
+                return true;
+            }
+
+            // Vertical ↓
+            if (r + 3 < ROWS &&
+                tab[r + 1][c] === joueur &&
+                tab[r + 2][c] === joueur &&
+                tab[r + 3][c] === joueur) {
+                return true;
+            }
+
+            // Diagonale ↘
+            if (r + 3 < ROWS && c + 3 < COLS &&
+                tab[r + 1][c + 1] === joueur &&
+                tab[r + 2][c + 2] === joueur &&
+                tab[r + 3][c + 3] === joueur) {
+                return true;
+            }
+
+            // Diagonale ↗
+            if (r - 3 >= 0 && c + 3 < COLS &&
+                tab[r - 1][c + 1] === joueur &&
+                tab[r - 2][c + 2] === joueur &&
+                tab[r - 3][c + 3] === joueur) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 function matchmakingRanked(){
-    if (queue.length < 2) return;
+    if (rankedQueue.length < 2) return;
 
-    queue.sort((a, b) => a.elo - b.elo);
+    rankedQueue.sort((a, b) => a.elo - b.elo);
 
-    for (let i = 0; i < queue.length - 1; i++) {
+    for (let i = 0; i < rankedQueue.length - 1; i++) {
         let j1=rankedQueue[i];
         let j2=rankedQueue[i+1];
 
         //temps d'attente en sec
-        tempsAttendu1=(Date.now() - p1.timeJoined) / 1000;
-        tempsAttendu2=(Date.now() - p2.timeJoined) / 1000;
+        tempsAttendu1=(Date.now() - j1.timeJoined) / 1000;
+        tempsAttendu2=(Date.now() - j2.timeJoined) / 1000;
 
         //range de matchmaking de base : 50
         let range1=50+(tempsAttendu1/2);
         let range2=50+(tempsAttendu2/2);
         
-        if (p2.elo-p1.elo >= range1 || p2.elo-p1.elo >= range2){
-            socket.to(p1.socketID).emit("senRoomRanked");
-            socket.to(p2.socketID).emit("senRoomRanked");
+        if ((j2.elo-j1.elo) <= range1 && (j2.elo-j1.elo) <= range2){
+            let roomID = genRoomID();
+
+            io.to(j1.socketID).emit("sendRoomRanked", roomID);
+            io.to(j2.socketID).emit("sendRoomRanked", roomID);
+
+            rankedQueue.splice(i,2);
+            
+            i--;
         }
     }
 }
 
-setInterval(matchmakingRanked(), 1000);
+
+
+setInterval(matchmakingRanked, 1000);
 
 async function Demarrage(){
     await bdd.connexion();

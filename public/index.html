@@ -21,9 +21,16 @@
                     <h1>Votre pseudo : </h1> 
                     <input type = "text" class ="txtPseudo" id = "txtPseudo" placeholder="Pseudo">
                     <h1>Votre mot de passe : </h1> 
+<<<<<<< Updated upstream
                     <input type = "text" class ="txtMdp" id = "txtMdp" placeholder="Mot de Passe">
                     <button class = "connecter" id = "connecter" onclick="connexionCompte()"><h1 class = "ptibtn">Se Connecter</h1></button>
                     <button class = "connecter" id = "creerCompte" onclick="creerCompte()"><h1 class = "ptibtn">Creer un compte</h1></button>
+=======
+                    <input type = "password" class ="txtMdp" id = "txtMdp" placeholder="Mot de Passe">
+                    <button class = "connecter" id = "connecter" onclick="connexionCompte()"><h1 class = "ptibtn">Se Connecter</h1></button>
+                    <button class = "connecter" id = "creerCompte" onclick="creerCompte()"><h1 class = "ptibtn">Creer un compte</h1></button>
+    
+>>>>>>> Stashed changes
                 </blockquote>
     
                 <blockquote id = "deconnect" hidden >
@@ -38,6 +45,7 @@
     
     
                 </blockquote>
+<<<<<<< Updated upstream
     
                 <hr>
                 <h1 class = "gros">Partie</h1>
@@ -52,6 +60,23 @@
                 <button class = "connecter" id = "chercher" onclick="qClasse()"><h1 class = "ptibtn">Rechercher</h1></button>
     
                 <h1>Votre code : </h1><h1 id = "code">XXXX</h1>
+=======
+                <blockquote id="partieG">
+                    <hr>
+                    <h1 class = "gros">Partie</h1>
+        
+                    <button class = "partie" id = "matchmaking" onclick="qPartie()"><h1 class = "btn">Trouvage de partie</h1></button>
+                    <button class = "partie" id = "Ranked" onclick="qClasse()" style="height: 65px;"><h1 class = "btn" id="btnRanked" >Trouvage de partie ranked</h1></button>
+        
+                    <hr>
+                    <h1 class = "gros">Privee</h1>
+        
+                    <input type = "text" class ="txtCode" id = "txtCode" placeholder="Code">
+                    <button class = "connecter" id = "chercher" onclick="joinCode()"><h1 class = "ptibtn">Rechercher</h1></button>
+        
+                    <h1>Votre code : </h1><h1 id = "code">XXXX</h1>
+                </blockquote>
+>>>>>>> Stashed changes
 
 
             </div>
@@ -72,6 +97,24 @@
 
         <div class = "zone-plateau">
 
+<<<<<<< Updated upstream
+=======
+
+            <div class ="buttons" id="buttons">
+
+                <input type="button" id="colonneA" class="colonne" onclick="colChoix(0)">
+                <input type="button" id="colonneB" class="colonne" onclick="colChoix(1)">
+                <input type="button" id="colonneC" class="colonne" onclick="colChoix(2)">
+                <input type="button" id="colonneD" class="colonne" onclick="colChoix(3)">
+                <input type="button" id="colonneE" class="colonne" onclick="colChoix(4)">
+                <input type="button" id="colonneF" class="colonne" onclick="colChoix(5)">
+                <input type="button" id="colonneG" class="colonne" onclick="colChoix(6)">
+
+            </div>
+
+
+
+>>>>>>> Stashed changes
             <div class="board" id="plateau">
                 <!-- Ligne 1 -->
                 <div id="A1" class="zone-jeton"></div><div id="B1" class="zone-jeton"></div><div id="C1" class="zone-jeton"></div><div id="D1" class="zone-jeton"></div><div id="E1" class="zone-jeton"></div><div id="F1" class="zone-jeton"></div><div id="G1" class="zone-jeton"></div>
