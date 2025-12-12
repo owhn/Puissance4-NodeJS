@@ -13,6 +13,7 @@
 /*Fond*/
 body{
     background-color: #141414;
+
 }
 
 blockquote{
@@ -33,6 +34,15 @@ hr{
     overflow: hidden;
     border-style: inset;
     border-width: 2px;
+}
+
+.layout {
+    display: flex;          /* met les éléments côte à côte */
+    justify-content: center; /* centre l’ensemble */
+    align-items: flex-start; /* aligne en haut */
+    gap: 40px;               /* espace entre les zones */
+    width: 100%;
+    margin-top: 50px;
 }
 
 /*/////////////////////////////////////////////////////////////////////////////////
@@ -257,7 +267,7 @@ h1{
     width: 840px;
     height: 720px;
     margin: 0px auto;
-    margin-top:142px;
+    margin-top:115px;
   
     display: grid;
     grid-template-columns: repeat(7, 1fr);
@@ -485,3 +495,11 @@ h1{
 /*/////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////*/
+
+.zone_menu,
+.zone-plateau,
+.zone_droite {
+    position: static; /* valeur par défaut */
+    margin: 20px;
+    margin-top: auto;
+}
