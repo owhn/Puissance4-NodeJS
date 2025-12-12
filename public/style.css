@@ -22,13 +22,66 @@ blockquote{
     margin-inline-end: 0px;
 }
 
+hr{
+    display: block;
+    margin-block-start: 0.8em;
+    margin-block-end: 0.5em;
+    margin-inline-start: auto;
+    margin-inline-end: auto;
+    color: white;
+    unicode-bidi: isolate;
+    overflow: hidden;
+    border-style: inset;
+    border-width: 2px;
+}
+
 /*/////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////*/
 /*Menu gauche*/
+/*Placements blocks*/
+.blockConnect{
+    padding: 10px;    
+    background-color: #585758;
+    border-radius:  20px / 20px ;
+    box-shadow:  0px 0px 25px rgb(255, 255, 255);
+    height:300px
+}
+.blockDeconnect{
+    padding: 10px;    
+    background-color: #585758;
+    border-radius:  20px / 20px ;
+    box-shadow:  0px 0px 25px rgb(255, 255, 255);
+    height:150px
+}
+.modifCompte{
+    padding: 10px;    
+    background-color: #585758;
+    border-radius:  20px / 20px ;
+    box-shadow:  0px 0px 25px rgb(255, 255, 255);
+    height:470px
+}
+/*Plus tout en haut*/
+.dansPartie{
+    margin-top: 30px;
+    padding: 10px;    
+    background-color: #585758;
+    border-radius:  20px / 20px ;
+    box-shadow:  0px 0px 25px rgb(255, 255, 255);
+    height:140px
+}
 
+.partieG{
+    margin-top: 30px;
+    padding: 10px;    
+    background-color: #585758;
+    border-radius:  20px / 20px ;
+    box-shadow:  0px 0px 25px rgb(255, 255, 255);
+    height:350px
+}
 
-
+/*////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////*/
 
 h1{
     color: #fcfcfc;
@@ -61,9 +114,8 @@ h1{
 
     display: block;
 
-    background-color: #585758;
-    border-radius:  20px / 20px ;
-    box-shadow:  0px 0px 25px rgb(255, 255, 255);
+    background-color: transparent;
+
 
 
 }
@@ -177,6 +229,10 @@ h1{
     box-shadow: inset 3px 3px 6px rgba(0,0,0,0.3);
     border: 2px solid #eeeeee;
 }
+.deconnecter:active{
+    box-shadow: inset 3px 3px 8px rgba(0,0,0,0.4);
+    transform: translateY(2px);
+}
 
 /*/////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////
@@ -278,6 +334,28 @@ h1{
 /////////////////////////////////////////////////////////////////////////////////*/
 /*Menu droite*/
 
+/*Placement menu*/
+.blockClassement{
+    padding: 10px;
+    background-color: #585758;
+    border-radius:  20px / 20px ;
+    box-shadow:  0px 0px 25px rgb(255, 255, 255);
+    height: 255px;
+}
+
+.dansPartieD{
+    padding: 10px;
+    margin-top: 30px;
+    background-color: #585758;
+    border-radius:  20px / 20px ;
+    box-shadow:  0px 0px 25px rgb(255, 255, 255);
+    height: 400px;
+}
+
+
+/*////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////*/
+
 .zone_droite{
     position: absolute;
     margin-top: -695px;
@@ -286,12 +364,6 @@ h1{
     height : 720px;
 
     display: block;
-
-    background-color: #585758;
-    border-radius:  20px / 20px ;
-    box-shadow:  0px 0px 25px rgb(255, 255, 255);
-
-
 }
 
 .btnTheme{
@@ -323,6 +395,8 @@ h1{
     border-radius: 20px/20px;
     width: 250px;
     height: 230px;
+    box-shadow:  0px 0px 25px rgb(255, 255, 255);
+
 
 }
 .afClassement{
@@ -336,11 +410,11 @@ h1{
 }
 
 .jpartieClasse{
-    margin-top: 40px;
+    margin-top: 0px;
 }
 
 .jpartie{
-    margin-top: 40px;
+    margin-top: 00px;
 }
 
 .blockTheme{

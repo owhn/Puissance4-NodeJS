@@ -27,6 +27,12 @@ socket.on("setLocalPlayerID",(data)=>{
 
 
 //BDD :
+function deconnecter(){
+    joueur.pseudo="Guest("+joueur.localPlayerID.substring(15)+")";
+    joueur.elo = 0;
+    document.getElementById("blockDeconnect").hidden = true
+    document.getElementById("blockConnect").hidden = false;
+}
 
 function connexionCompte(){
     // console.log("connexionCompte");
@@ -44,7 +50,7 @@ socket.on("login_ok", (data)=>{
     console.log("login ok : "+data.pseudo+ " " + data.elo);
     document.getElementById("pseudo").textContent=joueur.pseudo;
     document.getElementById("blockConnect").hidden = true;
-    document.getElementById("deconnect").hidden = false
+    document.getElementById("blockDeconnect").hidden = false
 
 });
 
