@@ -1,7 +1,7 @@
 //BACK END : Antoine
 //Je vais mettre ici toutes les fonctions (pour les boutons) que tu lieras au html, on associera le styleClient.js à ce fichier*
 
-let roomID;
+let roomID,turn;
 let pseudo,mdp;
 
 const joueur = {
@@ -106,13 +106,46 @@ function reset(){
 
 }
 
-let code=document.getElementById("txtCode"); //ajt .value qd créé
-function joinRoom(code){
-
+ //ajt .value qd créé
+function joinRoom(){
+    let code=document.getElementById("txtCode").value;
 }
 
 
-
+//fonctions du jeu en soi
 function colChoix(col){
-    socket.emit("choix", {col,roomID,});
+    socket.emit("choix", {
+        col,
+        roomID,
+        localPlayerID: joueur.localPlayerID
+    });
 }
+
+socket.on("placement",(data)=>{
+    let idPos="";
+    idPos=data.col+data.ligne;
+    let div=document.getElementById(idPos);
+    if(data.player===1) div.style.backgroundColor="red";
+    else div.style.backgroundColor="yellow";
+});
+
+socket.on("colPleine",(colonnePleine)=>{
+    console.log("colonne pleine : " + colonnePleine);
+    //afficher l'info
+});
+
+socket.on("victoire",(data)=>{
+    console.log("gagnant : " + data.pseudo + " numJoueur :" + data.gagnant);
+    //clear le client ? ou proposer un rematch ? 
+
+});
+
+socket.on("nul",()=>{
+    console.log("Match nul");
+    //clear le client
+});
+
+socket.on("tourSuivant",(tour)=>{
+    turn=tour;
+    console.log("tour du joueur : " + turn);
+});

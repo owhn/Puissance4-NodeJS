@@ -123,7 +123,8 @@ io.on("connection", (socket) => {
         }
         rooms[data.roomID].joueurs.push(data.pseudo);
         rooms[data.roomID].IDs.push(data.localPlayerID);
-        
+        let tour=Math.floor(Math.random() * 2) + 1;
+        rooms[data.roomID].turn = tour;
         //console.log("Room", data.roomID, rooms[data.roomID]);
     });
 
@@ -158,7 +159,8 @@ io.on("connection", (socket) => {
         rooms[data.roomID].joueurs.push(data.pseudo);
         rooms[data.roomID].IDs.push(data.localPlayerID);
         rooms[data.roomID].elo.push(data.elo);
-        
+        let tour=Math.floor(Math.random() * 2) + 1;
+        rooms[data.roomID].turn = tour;     
         //console.log("Room", data.roomID, rooms[data.roomID]);
     });
 
@@ -166,16 +168,57 @@ io.on("connection", (socket) => {
         let room=rooms[data.roomID];
         let col=data.col;
         let charCol = ['A','B','C','D','E','F','G'];
-
+        
         if(!room) return;
+
+        //récuperer l'index du joueur : 1 = j1 ou 2 = j2 et vérifier si il est dans la room
+        let playerNumber= room.IDs.indexOf(data.localPlayerID)+1;
+        if(playerNumber === -1) return;
+        
+        //si c'est pas son tour return
+        if(room.turn !== playerNumber) return;
+
         let tab=room.board;
+        if(tab[0][col]!==0){
+            socket.emit("colPleine", charCol[col]);
+            return;
+        }
+
         for(let i = 5; i >=0;i--){
             if(tab[i][col]===0){
-                tab[i][col]=room.joueurs[room.turn];
-                io.to(data.roomID).emit("placement", {ligne: i+1})
+                tab[i][col]=playerNumber;
+                io.to(data.roomID).emit("placement", {
+                    ligne: i+1,
+                    col: charCol[col],
+                    player: playerNumber
+                });
+                break;
             }
         }
 
+        // vérifier la victoire
+        if(checkWin(tab,playerNumber)){
+            io.to(data.roomID).emit("victoire",{
+                gagnant: playerNumber,
+                pseudo: room.joueurs[playerNumber-1]
+            });
+            room.turn=1;
+            return;
+        }
+
+        //vérifier si match nul
+        const siNul = tab.every(row => row.every(cell => cell !==0));
+        if (siNul){
+            io.to(data.roomID).emit("nul");
+            room.board = creerTabVide();
+            room.turn=1;
+            return;
+        }
+
+        // passer le tour au joueur suivant
+        if(room.turn===1) room.turn=2;
+        else room.turn=1;
+        io.to(data.roomID).emit("tourSuivant", (room.turn));
     });
 
 });
