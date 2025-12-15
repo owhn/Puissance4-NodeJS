@@ -228,6 +228,18 @@ io.on("connection", (socket) => {
         console.log("room privée rejointe : "+ data.roomID + " ID : " + data.localPlayerID);
     });
 
+    socket.on("reset1",data=>{
+        io.to(data.roomID).emit("creset",".");
+    })
+
+    socket.on("aband",(data)=>{
+        let room=rooms[data.roomID];
+
+        if (data.localPlayerID === room.IDs[0]) io.to(data.roomID).emit("victoire",{pseudo: room.joueurs[1]});
+        if (data.localPlayerID === room.IDs[1]) io.to(data.roomID).emit("victoire",{pseudo: room.joueurs[0]});
+        
+    })
+
     socket.on("choix",(data)=>{
         let room=rooms[data.roomID];
         let col=data.col;
@@ -286,6 +298,7 @@ io.on("connection", (socket) => {
     });
 
 });
+
 
 function checkWin(tab, joueur) {
     const ROWS = 6;

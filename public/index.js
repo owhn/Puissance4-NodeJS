@@ -127,15 +127,61 @@ function majPseudo(){
 
 }
 
+let th;
+
 function selectTheme() {
     const theme = document.getElementById("theme").value;
     
     document.body.classList.remove("theme-spider", "theme-bk", "theme-gf");
     document.body.classList.add("theme-" + theme);
     document.body.classList.add(joueur.pseudo === jj1 ? "jj1" : "jj2");
+
+    let cases = document.querySelectorAll("#plateau div");
+    for (let c of cases) {
+
+        if (theme === "spider") {
+    
+            if (c.classList.contains("kaaris") || c.classList.contains("gf")) {
+                c.classList.remove("kaaris", "gf");
+                c.classList.add("rouge");
+            }
+    
+            if (c.classList.contains("booba") || c.classList.contains("pgf")) {
+                c.classList.remove("booba", "pgf");
+                c.classList.add("jaune");
+            }
+        }
+    
+        if (theme === "bk") {
+    
+            if (c.classList.contains("rouge") || c.classList.contains("gf")) {
+                c.classList.remove("rouge", "gf");
+                c.classList.add("kaaris");
+            }
+    
+            if (c.classList.contains("jaune") || c.classList.contains("pgf")) {
+                c.classList.remove("jaune", "pgf");
+                c.classList.add("booba");
+            }
+        }
+    
+        if (theme === "gf") {
+    
+            if (c.classList.contains("kaaris") || c.classList.contains("rouge")) {
+                c.classList.remove("kaaris", "rouge");
+                c.classList.add("gf");
+            }
+    
+            if (c.classList.contains("booba") || c.classList.contains("jaune")) {
+                c.classList.remove("booba", "jaune");
+                c.classList.add("pgf");
+            }
+        }
+    }
     
     console.log("test jj1 :"+jj1)
     console.log("test joueur.pseudo : "+ joueur.pseudo)
+    th = theme
 }
 
 socket.on("top5",(data)=>{
@@ -167,13 +213,34 @@ socket.on("sendRoomRanked", (data) => {
 });
 
 function abandon(){
+    socket.emit("aband",{roomID:roomID,localPlayerID : joueur.localPlayerID})
 
 }
 
+
+let jclique = [];
 function reset(){
+    const bgColor = getComputedStyle(compte).backgroundColor;
+    
+    jclique.push(joueur.pseudo)
 
+    if (bgColor === "rgb(86, 182, 255)") { 
+        socket.emit("reset1",{roomID:roomID})
+    } else if (bgColor === "rgb(33, 252, 51)") {
+        if (joueur.pseudo !== jclique[0]){
+            socket.emit("reset2",)
+            compte.style.backgroundColor = "#56b6ff";
+            blockdeco.hidden = true;
+            blockpartie.hidden =true;
+            blockmodif.hidden = false;
+        }
+    }
 }
 
+socket.on("creset",data=>{
+    compte.style.backgroundColor = "#21fc33";
+
+})
 
 function creerRoom(){
     socket.emit("creerRoom",{
@@ -225,8 +292,16 @@ socket.on("placement",(data)=>{
     let idPos="";
     idPos=data.col+data.ligne;
     let div=document.getElementById(idPos);
-    if(data.player===1) div.style.backgroundColor="red";
-    else div.style.backgroundColor="yellow";
+    if(data.player===1){
+        if(th === "spider") div.classList.add("rouge");
+        if(th === "bk") div.classList.add("kaaris");
+        if(th === "gf") div.classList.add("gf")
+    }
+    else{
+        if(th === "spider") div.classList.add("jaune");
+        if(th === "bk") div.classList.add("booba");
+        if(th === "gf") div.classList.add("pgf")
+    } 
 });
 
 socket.on("colPleine",(colonnePleine)=>{
@@ -235,7 +310,9 @@ socket.on("colPleine",(colonnePleine)=>{
 });
 
 socket.on("victoire",(data)=>{
-    console.log("gagnant : " + data.pseudo + " numJoueur :" + data.gagnant);
+    console.log("gagnant : " + data.pseudo);
+    document.getElementById("blockVictoire").hidden = false;
+    document.getElementById("victoire").textContent = "Le gagnant est : " + data.pseudo
     //clear le client ? ou proposer un rematch ? 
 });
 
