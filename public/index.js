@@ -26,6 +26,7 @@ socket.on("setLocalPlayerID",(data)=>{
 
 
 
+
 //BDD :
 
 function deconnecter(){
@@ -103,7 +104,11 @@ socket.on("sendRoom", (data) => {
     //document.getElementById("InfoJ1").textContent = joueur.pseudo;
 });
 
+let jj1,jj2;
+
 socket.on("txtpseudo",(data,turn)=>{
+    jj1 = data[0];
+    jj2 = data[1];
     document.getElementById("infoJ1").textContent = data[0]
     document.getElementById("infoJ2").textContent = data[1]
     if (turn === 1) {
@@ -114,8 +119,24 @@ socket.on("txtpseudo",(data,turn)=>{
         document.getElementById("J2T").hidden = false;
         document.getElementById("J1T").hidden = true;
     }
+    selectTheme();
 
 })
+
+function majPseudo(){
+
+}
+
+function selectTheme() {
+    const theme = document.getElementById("theme").value;
+    
+    document.body.classList.remove("theme-spider", "theme-bk", "theme-gf");
+    document.body.classList.add("theme-" + theme);
+    document.body.classList.add(joueur.pseudo === jj1 ? "jj1" : "jj2");
+    
+    console.log("test jj1 :"+jj1)
+    console.log("test joueur.pseudo : "+ joueur.pseudo)
+}
 
 socket.on("top5",(data)=>{
     document.getElementById("t1").textContent = "1 - "+data[0].pseudo+" : "+data[0].elo;
@@ -127,6 +148,7 @@ socket.on("top5",(data)=>{
 })
 
 function qClasse(){
+
     if(joueur.elo>0) socket.emit("rankedQueue",{localPlayerID: joueur.localPlayerID, elo: joueur.elo});
     else {
         document.getElementById("btnRanked").textContent="Se connecter pour jouer en ranked";
@@ -158,6 +180,7 @@ function creerRoom(){
         pseudo: joueur.pseudo,
         localPlayerID: joueur.localPlayerID                    
     });
+
 }
 
 function trouverRoom(){
@@ -179,10 +202,14 @@ function quitterPartie(){
 
 socket.on("quitRoom",()=>{
     console.log("partie quittée");
+    document.getElementById("dansPartie").hidden = true;
+    document.getElementById("partieG").hidden = false;
 });
 
 socket.on("delRoom",()=>{
     console.log("le joueur adverse a quitté, room supprimée");
+    document.getElementById("dansPartie").hidden = true;
+    document.getElementById("partieG").hidden = false;
 });
 
 //fonctions du jeu en soi

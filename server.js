@@ -187,6 +187,7 @@ io.on("connection", (socket) => {
 
     socket.on("quitterPartie",(roomID)=>{
         let room = rooms[roomID];
+        console.log(room.IDs[0])
         if(socket.id===room.IDs[0]){
             socket.emit("quitRoom");
             socket.to(room.IDs[1]).emit("delRoom");

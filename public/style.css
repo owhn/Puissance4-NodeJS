@@ -252,6 +252,19 @@ h1{
     transform: translateY(2px);
 }
 
+.creerRoom{
+    position: absolute;
+    background-color: #56b6ff;
+    width: 25px;
+    height: 25px;
+    margin-top: -27px;
+    text-align: center;
+    border-radius: 20px / 20px;
+    border: 0px;
+    box-shadow: inset 3px 3px 6px rgba(0,0,0,0.3);
+    border: 2px solid #eeeeee;
+}
+
 /*/////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////*/
@@ -334,6 +347,35 @@ h1{
     border-color: white;
   }
 
+
+  /* SPIDER */
+
+  .jj1.theme-spider .colonne:hover {
+    background-image: url("jspiderr.png");
+  }
+
+  .jj2.theme-spider .colonne:hover {
+    background-image: url("jspiderj.png");
+  }
+  
+  /* BK */
+  .jj1.theme-bk .colonne:hover {
+    background-image: url("jkaarisr.png");
+  }
+  
+  .jj2.theme-bk .colonne:hover {
+    background-image: url("jboobaj.png");
+  }
+  
+  /* GF */
+  .jj1.theme-gf .colonne:hover {
+    background-image: url("jgfr.png");
+  }
+  
+  .jj2.theme-gf .colonne:hover {
+    background-image: url("jpgfj.png");
+  }
+
 /*Boutons*/
 .colonne{
     position: relative;
@@ -345,7 +387,6 @@ h1{
 }
 .colonne:hover{
     background: transparent no-repeat ;
-    background-image:url(jspiderr.PNG)  ;
     background-size: 110px 110px;
     background-position: 0px 0px;
 }
