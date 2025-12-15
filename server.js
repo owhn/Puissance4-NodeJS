@@ -298,8 +298,6 @@ function matchmakingRanked(){
     }
 }
 
-
-
 setInterval(matchmakingRanked, 1000);
 
 async function Demarrage(){
