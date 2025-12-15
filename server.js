@@ -217,6 +217,8 @@ io.on("connection", (socket) => {
         }
         rooms[roomID].joueurs.push(data.pseudo);
         rooms[roomID].IDs.push(data.localPlayerID);
+        let tour=Math.floor(Math.random() * 2) + 1;
+        rooms[data.roomID].turn = tour;
         
         socket.roomID=roomID;
         socket.emit("roomPV_ok",(roomID));
@@ -226,15 +228,14 @@ io.on("connection", (socket) => {
 
     socket.on("trouverRoom",(data)=>{
         if(!rooms[data.roomID]) return;
-
         socket.join(data.roomID);
         rooms[data.roomID].joueurs.push(data.pseudo);
         rooms[data.roomID].IDs.push(data.localPlayerID);
         socket.emit("roomPV_ok",(data.roomID));
         console.log("room privée rejointe : "+ data.roomID + " ID : " + data.localPlayerID);
         socket.roomID=data.roomID;
-        let tour=Math.floor(Math.random() * 2) + 1;
-        rooms[data.roomID].turn = tour;
+        
+        console.log(rooms[data.roomID]);
     });
 
     socket.on("choix",(data)=>{
