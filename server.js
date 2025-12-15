@@ -142,6 +142,9 @@ io.on("connection", (socket) => {
         rooms[data.roomID].IDs.push(data.localPlayerID);
         let tour=Math.floor(Math.random() * 2) + 1;
         rooms[data.roomID].turn = tour;
+        //console.log("Room", data.roomID, rooms[data.roomID]);
+        io.to(data.roomID).emit("txtpseudo",(rooms[data.roomID].joueurs),(rooms[data.roomID].turn))
+
         socket.roomID=data.roomID;
     });
 
@@ -358,7 +361,13 @@ function matchmakingRanked(){
     }
 }
 
+async function classement(){
+    const result = await bdd.top();
+    io.emit("top5", result);
+}
+
 setInterval(matchmakingRanked, 1000);
+setInterval(classement,1000)
 
 async function Demarrage(){
     await bdd.connexion();
