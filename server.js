@@ -126,6 +126,8 @@ io.on("connection", (socket) => {
         let tour=Math.floor(Math.random() * 2) + 1;
         rooms[data.roomID].turn = tour;
         //console.log("Room", data.roomID, rooms[data.roomID]);
+        io.to(data.roomID).emit("txtpseudo",(rooms[data.roomID].joueurs),(rooms[data.roomID].turn))
+
     });
 
     socket.on("rankedQueue",(data)=>{
@@ -298,11 +300,17 @@ function matchmakingRanked(){
     }
 }
 
+async function classement(){
+    const result = await bdd.top();
+    io.emit("top5", result);
+}
+
 setInterval(matchmakingRanked, 1000);
+setInterval(classement,1000)
 
 async function Demarrage(){
     await bdd.connexion();
-    server.listen(PORT, "10.187.52.55",()=>{
+    server.listen(PORT, "localhost",()=>{
         console.log("serv démarré : http://localhost:"+PORT);
     });
 };

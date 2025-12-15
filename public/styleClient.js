@@ -28,4 +28,9 @@ function retour(){
     blockmodif.hidden = true;
 }
 
+function chTheme(){
+    var theme = document.getElementById("theme")
+    if(theme.value)
+}
+
 
