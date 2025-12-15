@@ -336,7 +336,10 @@ h1{
     border: transparent;
 }
 
-
+.colonne:hover{
+    background-color: grey;
+    opacity: 15%;
+}
 
 
 /*/////////////////////////////////////////////////////////////////////////////////

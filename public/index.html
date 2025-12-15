@@ -60,7 +60,7 @@
 
                     <blockquote id ="dansPartie" class = "dansPartie" hidden >
 
-                        <button class = "quitter" id = "quitPartie" ><h1 class = "btn">Quitter la partie</h1></button>
+                        <button class = "quitter" id = "quitPartie" onclick="quitterPartie()"><h1 class = "btn">Quitter la partie</h1></button>
                         <h1>Votre code : </h1><h1 id = "code">XXXX</h1>
 
         
@@ -75,7 +75,8 @@
                         <h1 class = "gros">Privee</h1>
             
                         <input type = "text" class ="txtCode" id = "txtCode" placeholder="Code">
-                        <button class = "connecter" id = "chercher" onclick="qClasse()"><h1 class = "ptibtn">Rechercher</h1></button>
+                        <button class = "creerRoom" id = "chercher" onclick="creerRoom()"><h1 class = "ptibtn">Creer une room</h1></button>
+                        <button class = "connecter" id = "chercher" onclick="trouverRoom()"><h1 class = "ptibtn">Rechercher</h1></button>
             
                     </blockquote>
 
@@ -166,7 +167,7 @@
                 <blockquote class ="blockTheme">
 
                     <h1 >Theme : </h1> 
-                    <select class ="theme" id="theme">
+                    <select class ="theme" id="theme" onchange="selectTheme()">
                     <option value="spider" selected="selected">SPIDER-MAN</option>
                     <option value="bk" >Booba - Kaaris</option>
                     <option value="gf" >George Floyd</option>
