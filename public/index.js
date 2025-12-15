@@ -55,6 +55,10 @@ socket.on("login_ok", (data)=>{
 
 });
 
+socket.on("dejaConnecte", (data)=>{
+    console.log("compte déjà connecté");
+});
+
 function creerCompte(){
     // console.log("creerCompte");
      pseudo=document.getElementById("txtPseudo").value;//ajt .value qd créé
@@ -96,8 +100,7 @@ socket.on("sendRoom", (data) => {
     document.getElementById("PARTIE").hidden = false;
     document.getElementById("pseudoP").textContent = joueur.pseudo
     document.getElementById("code").textContent = roomID.substring(4)
-
-    console.log(joueur.pseudo);
+    //document.getElementById("InfoJ1").textContent = joueur.pseudo;
 });
 
 socket.on("txtpseudo",(data,turn)=>{
@@ -149,11 +152,38 @@ function reset(){
 
 }
 
- //ajt .value qd créé
-function joinRoom(){
-    let code=document.getElementById("txtCode").value;
+
+function creerRoom(){
+    socket.emit("creerRoom",{
+        pseudo: joueur.pseudo,
+        localPlayerID: joueur.localPlayerID                    
+    });
 }
 
+function trouverRoom(){
+    let code="room"+document.getElementById("txtCode").value;
+    socket.emit("trouverRoom",{
+        pseudo: joueur.pseudo,
+        localPlayerID: joueur.localPlayerID,
+        roomID: code
+    });
+}
+
+socket.on("roomPV_ok",(roomID)=>{
+    console.log("room : " + roomID);
+});
+
+function quitterPartie(){
+    socket.emit("quitterPartie",(roomID));
+}
+
+socket.on("quitRoom",()=>{
+    console.log("partie quittée");
+});
+
+socket.on("delRoom",()=>{
+    console.log("le joueur adverse a quitté, room supprimée");
+});
 
 //fonctions du jeu en soi
 function colChoix(col){
@@ -180,7 +210,6 @@ socket.on("colPleine",(colonnePleine)=>{
 socket.on("victoire",(data)=>{
     console.log("gagnant : " + data.pseudo + " numJoueur :" + data.gagnant);
     //clear le client ? ou proposer un rematch ? 
-
 });
 
 socket.on("nul",()=>{

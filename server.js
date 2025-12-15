@@ -14,6 +14,8 @@ app.use(express.static("public"));
 const server = http.createServer(app); //Création serveur http
 const io = socket(server); //Initialisation de socket.io
 
+const alrConnected=[];
+
 const rooms = {
     joueurs: [],
     IDs: [],
@@ -21,15 +23,7 @@ const rooms = {
     votes: [],
     turn: 0,
     board: creerTabVide()
-}; //rooms[roomID] = {joueurs = [pseudoJ1, pseudoJ2] , ID = [localPlayerIDs]}
-
-const privateRooms = {
-    joueurs: [],
-    IDs: [],
-    votes: [],
-    turn: 0,
-    board: creerTabVide()
-}; 
+}; //rooms[roomID] = {joueurs = [pseudoJ1, pseudoJ2] , ID = [localPlayerIDs]}R
 
 let rankedQueue = [];// joueur : {socketID, elo,timestamp:Date.now()}
 let queue = [];// socketID
@@ -48,14 +42,32 @@ function creerTabVide(){
 function genRoomID() {
     let id;
     do {
-        id = "room" + Math.floor(Math.random() * 1000000);
+        id = "room" + Math.floor(10000 + Math.random() * 90000);
+    } while (rooms[id]); // ça boucle tant que l'id existe déjà
+    return id;
+}
+
+function genRoomIDpv() {
+    let id;
+    do {
+        id = "room" + Math.floor(1000+Math.random() * 9000);
     } while (rooms[id]); // ça boucle tant que l'id existe déjà
     return id;
 }
 
 
+
 io.on("connection", (socket) => {
     console.log("client connecté " + socket.id);
+
+    socket.on("disconnect", () => {
+        console.log("Déconnexion :", socket.id);
+        queue = queue.filter(id => id !== socketID); //enlever le joueur des queues
+        rankedQueue = rankedQueue.filter(j => j.socketID !== socketID);
+        let roomID=socket.roomID;
+        delete rooms[roomID];
+        console.log("room " + roomID + " supprimée");
+      });
 
     socket.on("newClient",(data)=>{
         socket.emit("setLocalPlayerID",(socket.id));    
@@ -63,6 +75,10 @@ io.on("connection", (socket) => {
 
     socket.on("connexionCompte", async (data)=>{
         console.log("connexionCompte p/m : " +data.pseudo + " " + data.mdp);
+        if (alrConnected.includes(data.pseudo)){
+            socket.emit("dejaConnecte",(data.pseudo));
+            return;
+        }
         try {
             const result = await bdd.loginUser(data.pseudo,data.mdp);
             console.log("after bdd.loginUser");
@@ -73,6 +89,7 @@ io.on("connection", (socket) => {
                 const elo = await bdd.getElo(data.pseudo);
                 socket.emit("login_ok", {pseudo : data.pseudo, elo});
                 console.log("login_ok");
+                alrConnected.push(data.pseudo);
             }
         }catch(e){
             socket.emit("erreurBDD", e);
@@ -128,6 +145,7 @@ io.on("connection", (socket) => {
         //console.log("Room", data.roomID, rooms[data.roomID]);
         io.to(data.roomID).emit("txtpseudo",(rooms[data.roomID].joueurs),(rooms[data.roomID].turn))
 
+        socket.roomID=data.roomID;
     });
 
     socket.on("rankedQueue",(data)=>{
@@ -163,7 +181,50 @@ io.on("connection", (socket) => {
         rooms[data.roomID].elo.push(data.elo);
         let tour=Math.floor(Math.random() * 2) + 1;
         rooms[data.roomID].turn = tour;     
+        socket.roomID=data.roomID;
         //console.log("Room", data.roomID, rooms[data.roomID]);
+    });
+
+    socket.on("quitterPartie",(roomID)=>{
+        let room = rooms[roomID];
+        if(socket.id===room.IDs[0]){
+            socket.emit("quitRoom");
+            socket.to(room.IDs[1]).emit("delRoom");
+        }
+        else {
+            socket.to(room.IDs[0]).emit("quitRoom");
+            socket.emit("delRoom");
+        }
+        
+        delete rooms[roomID];
+    });
+
+    socket.on("creerRoom",(data)=>{
+        let roomID = genRoomIDpv();//generer un code à 4 chiffres
+        rooms[roomID] = {
+            joueurs: [],
+            IDs: [],
+            board: creerTabVide(),
+            turn: 1
+        }
+        rooms[roomID].joueurs.push(data.pseudo);
+        rooms[roomID].IDs.push(data.localPlayerID);
+        
+        socket.join(roomID);
+
+        socket.emit("roomPV_ok",(roomID));
+
+        console.log("room privée créée : "+ roomID);
+    }); 
+
+    socket.on("trouverRoom",(data)=>{
+        if(!rooms[data.roomID]) return;
+
+        socket.join(data.roomID);
+        rooms[data.roomID].joueurs.push(data.pseudo);
+        rooms[data.roomID].IDs.push(data.localPlayerID);
+        socket.emit("roomPV_ok",(data.roomID));
+        console.log("room privée rejointe : "+ data.roomID + " ID : " + data.localPlayerID);
     });
 
     socket.on("choix",(data)=>{
