@@ -11,7 +11,6 @@ const joueur = {
 };
 
 
-
 const socket = io();
 socket.on('connect', (data) => {
     socket.emit("newClient",(data));
@@ -125,8 +124,7 @@ socket.on("placement",(data)=>{
     let idPos="";
     idPos=data.col+data.ligne;
     let div=document.getElementById(idPos);
-    if(data.player===1) div.style.backgroundColor="red";
-    else div.style.backgroundColor="yellow";
+    styleClient.skinJoueur(div);    
 });
 
 socket.on("colPleine",(colonnePleine)=>{
