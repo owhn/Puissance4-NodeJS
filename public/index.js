@@ -1,3 +1,4 @@
+
 //BACK END : Antoine
 //Je vais mettre ici toutes les fonctions (pour les boutons) que tu lieras au html, on associera le styleClient.js à ce fichier*
 
@@ -27,6 +28,14 @@ socket.on("setLocalPlayerID",(data)=>{
 
 //BDD :
 
+function deconnecter(){
+    joueur.pseudo="Guest("+joueur.localPlayerID.substring(15)+")";
+    joueur.elo = 0;
+    document.getElementById("blockDeconnect").hidden = true
+    document.getElementById("blockConnect").hidden = false;
+}
+
+
 function connexionCompte(){
     // console.log("connexionCompte");
     pseudo=document.getElementById("txtPseudo").value;//ajt .value qd créé
@@ -37,13 +46,12 @@ function connexionCompte(){
 }
 
 socket.on("login_ok", (data)=>{
-
     joueur.pseudo=data.pseudo;
     joueur.elo=data.elo;
     console.log("login ok : "+data.pseudo+ " " + data.elo);
     document.getElementById("pseudo").textContent=joueur.pseudo;
+    document.getElementById("blockDeconnect").hidden = false
     document.getElementById("blockConnect").hidden = true;
-    document.getElementById("deconnect").hidden = false
 
 });
 
@@ -80,6 +88,11 @@ socket.on("sendRoom", (data) => {
         pseudo : joueur.pseudo,
         localPlayerID : joueur.localPlayerID
     });
+    document.getElementById("partieG").hidden = true;
+    document.getElementById("dansPartie").hidden = false;
+    document.getElementById("dansPartieD").hidden = false;
+    document.getElementById("code").textContent = roomID.substring(4)
+    document.getElementById("InfoJ1").textContent = joueur.pseudo
 });
 
 function qClasse(){
@@ -127,7 +140,8 @@ socket.on("placement",(data)=>{
     let idPos="";
     idPos=data.col+data.ligne;
     let div=document.getElementById(idPos);
-    styleClient.skinJoueur(div);    
+    if(data.player===1) div.style.backgroundColor="red";
+    else div.style.backgroundColor="yellow";
 });
 
 socket.on("colPleine",(colonnePleine)=>{

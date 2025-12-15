@@ -5,7 +5,7 @@
 
 
 var compte = document.getElementById("btnTheme")
-var blockdeco = document.getElementById("deconnect")
+var blockdeco = document.getElementById("blockDeconnect")
 var blockpartie = document.getElementById("partieG")
 var blockmodif = document.getElementById("modifCompte")
 
