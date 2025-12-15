@@ -29,6 +29,7 @@ socket.on("setLocalPlayerID",(data)=>{
 //BDD :
 
 function deconnecter(){
+    socket.emit("nologin",(joueur.pseudo));
     joueur.pseudo="Guest("+joueur.localPlayerID.substring(15)+")";
     joueur.elo = 0;
     document.getElementById("blockDeconnect").hidden = true
@@ -50,7 +51,7 @@ socket.on("login_ok", (data)=>{
     joueur.elo=data.elo;
     console.log("login ok : "+data.pseudo+ " " + data.elo);
     document.getElementById("pseudo").textContent=joueur.pseudo;
-    document.getElementById("blockDeconnect").hidden = false
+    document.getElementById("blockDeconnect").hidden = false;
     document.getElementById("blockConnect").hidden = true;
 
 });
@@ -118,7 +119,6 @@ socket.on("sendRoomRanked", (data) => {
 });
 
 function abandon(){
-
 }
 
 function reset(){
@@ -155,7 +155,7 @@ socket.on("quitRoom",()=>{
 });
 
 socket.on("delRoom",()=>{
-    console.log("le joueur adverse a quitté, room supprimée");
+    console.log("room supprimée");
 });
 
 //fonctions du jeu en soi
