@@ -210,15 +210,15 @@ io.on("connection", (socket) => {
         rooms[roomID] = {
             joueurs: [],
             IDs: [],
-            elo: 0,
+            elo: [],
             votes: [],
-            board: creerTabVide(),
-            turn: 0
+            turn: 0,
+            board: creerTabVide()
         }
         rooms[roomID].joueurs.push(data.pseudo);
-        rooms[roomID].IDs.push(data.localPlayerID);
+        rooms[roomID].IDs.push(socket.id);
         let tour=Math.floor(Math.random() * 2) + 1;
-        rooms[data.roomID].turn = tour;
+        rooms[roomID].turn = tour;
         
         socket.roomID=roomID;
         socket.emit("roomPV_ok",(roomID));

@@ -119,6 +119,7 @@ socket.on("sendRoomRanked", (data) => {
 });
 
 function abandon(){
+
 }
 
 function reset(){
@@ -142,8 +143,9 @@ function trouverRoom(){
     });
 }
 
-socket.on("roomPV_ok",(roomID)=>{
-    console.log("room : " + roomID);
+socket.on("roomPV_ok",(data)=>{
+    console.log("room : " + data);
+    roomID=data;
 });
 
 function quitterPartie(){
