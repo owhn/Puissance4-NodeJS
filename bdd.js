@@ -51,11 +51,23 @@ async function updateElo(pseudo, newElo){
     [newElo,pseudo]);
     return rows[0].elo;
 }
+async function top(){
+    const rows = []
+    const [lignes] = await bdd.execute("SELECT p4_joueurs.pseudo, p4_elo.elo FROM p4_joueurs JOIN p4_elo ON p4_joueurs.id = p4_elo.id_joueur ORDER BY elo DESC");
+    for (let i = 0 ;i<5;i++){
+        rows.push(lignes[i])
+    }
+
+
+
+    return rows
+}
 
 module.exports = {
     connexion,
     createUser,
     loginUser,
     getElo,
-    updateElo
+    updateElo,
+    top
 };

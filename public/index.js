@@ -20,7 +20,7 @@ socket.on('connect', (data) => {
 socket.on("setLocalPlayerID",(data)=>{
     joueur.localPlayerID=data;
     console.log("localPlayerID : " + joueur.localPlayerID);
-    joueur.pseudo="Invité("+joueur.localPlayerID.substring(15)+")";
+    joueur.pseudo="Invite "+joueur.localPlayerID.substring(15);
     console.log(joueur.pseudo);
 })
 
@@ -30,7 +30,7 @@ socket.on("setLocalPlayerID",(data)=>{
 
 function deconnecter(){
     socket.emit("nologin",(joueur.pseudo));
-    joueur.pseudo="Guest("+joueur.localPlayerID.substring(15)+")";
+    joueur.pseudo="Invite "+joueur.localPlayerID.substring(15);
     joueur.elo = 0;
     document.getElementById("blockDeconnect").hidden = true
     document.getElementById("blockConnect").hidden = false;
@@ -96,9 +96,36 @@ socket.on("sendRoom", (data) => {
     document.getElementById("partieG").hidden = true;
     document.getElementById("dansPartie").hidden = false;
     document.getElementById("dansPartieD").hidden = false;
+    document.getElementById("blockConnect").hidden = true;
+    document.getElementById("blockDeconnect").hidden = true;
+    document.getElementById("PARTIE").hidden = false;
+    document.getElementById("pseudoP").textContent = joueur.pseudo
     document.getElementById("code").textContent = roomID.substring(4)
     //document.getElementById("InfoJ1").textContent = joueur.pseudo;
 });
+
+socket.on("txtpseudo",(data,turn)=>{
+    document.getElementById("infoJ1").textContent = data[0]
+    document.getElementById("infoJ2").textContent = data[1]
+    if (turn === 1) {
+        document.getElementById("J1T").hidden = false;
+        document.getElementById("J2T").hidden = true;
+    }
+    else if(turn === 2){
+        document.getElementById("J2T").hidden = false;
+        document.getElementById("J1T").hidden = true;
+    }
+
+})
+
+socket.on("top5",(data)=>{
+    document.getElementById("t1").textContent = "1 - "+data[0].pseudo+" : "+data[0].elo;
+    document.getElementById("t2").textContent = "2 - "+data[1].pseudo+" : "+data[1].elo;
+    document.getElementById("t3").textContent = "3 - "+data[2].pseudo+" : "+data[2].elo;
+    document.getElementById("t4").textContent = "4 - "+data[3].pseudo+" : "+data[3].elo;
+    document.getElementById("t5").textContent = "5 - "+data[4].pseudo+" : "+data[4].elo;
+
+})
 
 function qClasse(){
     if(joueur.elo>0) socket.emit("rankedQueue",{localPlayerID: joueur.localPlayerID, elo: joueur.elo});
@@ -195,4 +222,12 @@ socket.on("nul",()=>{
 socket.on("tourSuivant",(tour)=>{
     turn=tour;
     console.log("tour du joueur : " + turn);
+    if (turn === 1) {
+        document.getElementById("J1T").hidden = false;
+        document.getElementById("J2T").hidden = true;
+    }
+    else if(turn === 2){
+        document.getElementById("J2T").hidden = false;
+        document.getElementById("J1T").hidden = true;
+    }
 });

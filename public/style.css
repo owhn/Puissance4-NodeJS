@@ -64,6 +64,14 @@ hr{
     box-shadow:  0px 0px 25px rgb(255, 255, 255);
     height:150px
 }
+
+.PARTIE{
+    padding: 10px;    
+    background-color: #585758;
+    border-radius:  20px / 20px ;
+    box-shadow:  0px 0px 25px rgb(255, 255, 255);
+    height:90px
+}
 .modifCompte{
     padding: 10px;    
     background-color: #585758;
@@ -344,6 +352,12 @@ h1{
     background-color: transparent;
     border: transparent;
 }
+.colonne:hover{
+    background: transparent no-repeat ;
+    background-image:url(jspiderr.PNG)  ;
+    background-size: 110px 110px;
+    background-position: 0px 0px;
+}
 
 .colonne:hover{
     background-color: grey;
@@ -437,6 +451,26 @@ h1{
 
 .jpartie{
     margin-top: 00px;
+}
+
+.J1T{
+    position: absolute;
+    width : 25px;
+    height: 25px;
+    margin-top: 10px;
+    margin-left: 50px;
+    border-radius: 50%;
+    background-color: #6aff3d;
+}
+
+.J2T{
+    position: absolute;
+    width : 25px;
+    height: 25px;
+    margin-top: 45px;
+    margin-left: 50px;
+    border-radius: 50%;
+    background-color: #6aff3d;
 }
 
 .blockTheme{
