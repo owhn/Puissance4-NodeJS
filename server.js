@@ -14,7 +14,7 @@ app.use(express.static("public"));
 const server = http.createServer(app); //Création serveur http
 const io = socket(server); //Initialisation de socket.io
 
-const alrConnected=[];
+let alrConnected=[];
 
 const rooms = {
     joueurs: [],
@@ -62,12 +62,17 @@ io.on("connection", (socket) => {
 
     socket.on("disconnect", () => {
         console.log("Déconnexion :", socket.id);
-        queue = queue.filter(id => id !== socketID); //enlever le joueur des queues
-        rankedQueue = rankedQueue.filter(j => j.socketID !== socketID);
+        queue = queue.filter(id => id !== socket.id); //enlever le joueur des queues
+        rankedQueue = rankedQueue.filter(j => j.socket.id !== socket.id);
         let roomID=socket.roomID;
+        io.to(roomID).emit("delRoom");
         delete rooms[roomID];
         console.log("room " + roomID + " supprimée");
-      });
+    });
+
+    socket.on("nologin",(data)=>{
+        alrConnected = alrConnected.filter(user => user !== data);
+    });
 
     socket.on("newClient",(data)=>{
         socket.emit("setLocalPlayerID",(socket.id));    
@@ -77,6 +82,7 @@ io.on("connection", (socket) => {
         console.log("connexionCompte p/m : " +data.pseudo + " " + data.mdp);
         if (alrConnected.includes(data.pseudo)){
             socket.emit("dejaConnecte",(data.pseudo));
+            console.log("deja connecte");
             return;
         }
         try {
@@ -142,6 +148,7 @@ io.on("connection", (socket) => {
         rooms[data.roomID].IDs.push(data.localPlayerID);
         let tour=Math.floor(Math.random() * 2) + 1;
         rooms[data.roomID].turn = tour;
+        
         //console.log("Room", data.roomID, rooms[data.roomID]);
         io.to(data.roomID).emit("txtpseudo",(rooms[data.roomID].joueurs),(rooms[data.roomID].turn))
 
@@ -201,17 +208,22 @@ io.on("connection", (socket) => {
 
     socket.on("creerRoom",(data)=>{
         let roomID = genRoomIDpv();//generer un code à 4 chiffres
+        socket.join(roomID);
+
         rooms[roomID] = {
             joueurs: [],
             IDs: [],
-            board: creerTabVide(),
-            turn: 1
+            elo: [],
+            votes: [],
+            turn: 0,
+            board: creerTabVide()
         }
         rooms[roomID].joueurs.push(data.pseudo);
-        rooms[roomID].IDs.push(data.localPlayerID);
+        rooms[roomID].IDs.push(socket.id);
+        let tour=Math.floor(Math.random() * 2) + 1;
+        rooms[roomID].turn = tour;
         
-        socket.join(roomID);
-
+        socket.roomID=roomID;
         socket.emit("roomPV_ok",(roomID));
 
         console.log("room privée créée : "+ roomID);
@@ -219,12 +231,14 @@ io.on("connection", (socket) => {
 
     socket.on("trouverRoom",(data)=>{
         if(!rooms[data.roomID]) return;
-
         socket.join(data.roomID);
         rooms[data.roomID].joueurs.push(data.pseudo);
         rooms[data.roomID].IDs.push(data.localPlayerID);
         socket.emit("roomPV_ok",(data.roomID));
         console.log("room privée rejointe : "+ data.roomID + " ID : " + data.localPlayerID);
+        socket.roomID=data.roomID;
+        
+        console.log(rooms[data.roomID]);
     });
 
     socket.on("choix",(data)=>{
@@ -235,9 +249,10 @@ io.on("connection", (socket) => {
         if(!room) return;
 
         //récuperer l'index du joueur : 1 = j1 ou 2 = j2 et vérifier si il est dans la room
-        let playerNumber= room.IDs.indexOf(data.localPlayerID)+1;
-        if(playerNumber === -1) return;
-        
+        let playerIndex= room.IDs.indexOf(socket.id);
+        if(playerIndex === -1) return;
+        let playerNumber= playerIndex+1;
+
         //si c'est pas son tour return
         if(room.turn !== playerNumber) return;
 

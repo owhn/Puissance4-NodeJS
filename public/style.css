@@ -334,6 +334,15 @@ h1{
     border-color: white;
   }
 
+  .zone-jeton.j1{
+    background: #e22525 url("sfspider.png") center/90% no-repeat;
+    border-color: white;
+  }
+  .zone-jeton.j2{
+    background: #ffe600 url("spidernoir.png") center/120% no-repeat;
+    border-color: white;
+  }
+
 /*Boutons*/
 .colonne{
     position: relative;
