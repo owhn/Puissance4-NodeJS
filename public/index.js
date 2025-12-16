@@ -30,12 +30,15 @@ socket.on("setLocalPlayerID",(data)=>{
 
 function deconnecter(){
     socket.emit("nologin",(joueur.pseudo));
-    joueur.pseudo="Invite "+joueur.localPlayerID.substring(15);
+    joueur.pseudo="Invite " + joueur.localPlayerID.substring(15);
     joueur.elo = 0;
     document.getElementById("blockDeconnect").hidden = true
     document.getElementById("blockConnect").hidden = false;
 }
 
+socket.on("nologin_ok",()=>{
+
+});
 
 function connexionCompte(){
     // console.log("connexionCompte");
@@ -143,16 +146,48 @@ socket.on("sendRoomRanked", (data) => {
         localPlayerID : joueur.localPlayerID,
         elo : joueur.elo
     });
+    document.getElementById("partieG").hidden = true;
+    document.getElementById("dansPartie").hidden = false;
+    document.getElementById("dansPartieD").hidden = false;
+    document.getElementById("blockConnect").hidden = true;
+    document.getElementById("blockDeconnect").hidden = true;
+    document.getElementById("PARTIE").hidden = false;
+    document.getElementById("pseudoP").textContent = joueur.pseudo
+    document.getElementById("code").textContent = roomID.substring(4)
 });
 
+let abandonner=0;
 function abandon(){
+    abandonner+=1;
+    document.getElementById("Abandon").style.backgroundColor="green";
+    if(abandonner>=2){
+        abandonner=0;
+        socket.emit("abandon",{pseudo: joueur.pseudo,roomID});
+        document.getElementById("Abandon").style.backgroundColor="#ec3c30";
+    }
+}   
 
-}
+socket.on("abandonAdverse",(data)=>{
+    console.log(data + " a abandonné");
+});
 
 function reset(){
-
+    socket.emit("reset",(roomID));
+    
 }
 
+socket.on("resetClient",()=>{
+    document.querySelectorAll(".zone-jeton").forEach(div => {
+        div.classList.remove("rouge", "jaune", "booba", "kaaris", "gf", "pgf");//ajouter si autres classes
+    });
+    document.getElementById("reset").style.backgroundColor="#56b6ff";
+
+});
+
+socket.on("aVote",()=>{
+    document.getElementById("reset").style.backgroundColor="#e0ba38";
+    console.log("quelqu'un a voté pour reset");
+});
 
 function creerRoom(){
     socket.emit("creerRoom",{
@@ -181,10 +216,25 @@ function quitterPartie(){
 
 socket.on("quitRoom",()=>{
     console.log("partie quittée");
+    document.getElementById("partieG").hidden = 0;
+    document.getElementById("dansPartie").hidden = 1;
+    document.getElementById("dansPartieD").hidden = 1;
+    if(joueur.elo===0) document.getElementById("blockConnect").hidden = 0;
+    else document.getElementById("blockDeconnect").hidden = 0;
+    document.getElementById("PARTIE").hidden = 1;
+    document.getElementById("code").textContent = roomID.substring(4);
 });
+
 
 socket.on("delRoom",()=>{
     console.log("room supprimée");
+    document.getElementById("partieG").hidden = 0;
+    document.getElementById("dansPartie").hidden = 1;
+    document.getElementById("dansPartieD").hidden = 1;
+    if(joueur.elo===0) document.getElementById("blockConnect").hidden = 0;
+    else document.getElementById("blockDeconnect").hidden = 0;
+    document.getElementById("PARTIE").hidden = 1;
+    document.getElementById("code").textContent = roomID.substring(4);
 });
 
 //fonctions du jeu en soi
@@ -200,8 +250,8 @@ socket.on("placement",(data)=>{
     let idPos="";
     idPos=data.col+data.ligne;
     let div=document.getElementById(idPos);
-    if(data.player===1) div.style.backgroundColor="red";
-    else div.style.backgroundColor="yellow";
+    if(data.player===1) div.classList.add("rouge");
+    else div.classList.add("jaune");
 });
 
 socket.on("colPleine",(colonnePleine)=>{
@@ -216,7 +266,7 @@ socket.on("victoire",(data)=>{
 
 socket.on("nul",()=>{
     console.log("Match nul");
-    //clear le client
+    reset();
 });
 
 socket.on("tourSuivant",(tour)=>{
@@ -231,3 +281,4 @@ socket.on("tourSuivant",(tour)=>{
         document.getElementById("J1T").hidden = true;
     }
 });
+

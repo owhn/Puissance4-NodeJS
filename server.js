@@ -21,6 +21,7 @@ const rooms = {
     IDs: [],
     elo: [],
     votes: [],
+    votesNul: [],
     turn: 0,
     board: creerTabVide()
 }; //rooms[roomID] = {joueurs = [pseudoJ1, pseudoJ2] , ID = [localPlayerIDs]}R
@@ -62,8 +63,9 @@ io.on("connection", (socket) => {
 
     socket.on("disconnect", () => {
         console.log("Déconnexion :", socket.id);
+        alrConnected = alrConnected.filter(user => user !== socket.id);
         queue = queue.filter(id => id !== socket.id); //enlever le joueur des queues
-        rankedQueue = rankedQueue.filter(j => j.socket.id !== socket.id);
+        rankedQueue = rankedQueue.filter(rQ => rQ.socket.id !== socket.id);
         let roomID=socket.roomID;
         io.to(roomID).emit("delRoom");
         delete rooms[roomID];
@@ -71,7 +73,7 @@ io.on("connection", (socket) => {
     });
 
     socket.on("nologin",(data)=>{
-        alrConnected = alrConnected.filter(user => user !== data);
+        alrConnected = alrConnected.filter(liste => liste.pseudo !== socket.id);
     });
 
     socket.on("newClient",(data)=>{
@@ -95,7 +97,7 @@ io.on("connection", (socket) => {
                 const elo = await bdd.getElo(data.pseudo);
                 socket.emit("login_ok", {pseudo : data.pseudo, elo});
                 console.log("login_ok");
-                alrConnected.push(data.pseudo);
+                alrConnected.push(socket.id);
             }
         }catch(e){
             socket.emit("erreurBDD", e);
@@ -145,7 +147,7 @@ io.on("connection", (socket) => {
             };
         }
         rooms[data.roomID].joueurs.push(data.pseudo);
-        rooms[data.roomID].IDs.push(data.localPlayerID);
+        rooms[data.roomID].IDs.push(socket.id);
         let tour=Math.floor(Math.random() * 2) + 1;
         rooms[data.roomID].turn = tour;
         
@@ -184,7 +186,7 @@ io.on("connection", (socket) => {
             };
         }
         rooms[data.roomID].joueurs.push(data.pseudo);
-        rooms[data.roomID].IDs.push(data.localPlayerID);
+        rooms[data.roomID].IDs.push(socket.id);
         rooms[data.roomID].elo.push(data.elo);
         let tour=Math.floor(Math.random() * 2) + 1;
         rooms[data.roomID].turn = tour;     
@@ -299,6 +301,41 @@ io.on("connection", (socket) => {
         io.to(data.roomID).emit("tourSuivant", (room.turn));
     });
 
+    socket.on("abandon",(data)=>{
+        console.log(data.pseudo + " a abandonné");
+        room=rooms[data.roomID];
+        let index=room.joueurs.indexOf(data.pseudo);
+        
+        if (index === -1) {
+            console.log("joueur introuvable dans la room");
+            return;
+        }
+        
+        if (room.joueurs.length < 2) {
+            console.log("pas d'adversaire");
+            return;
+        }
+
+        let adversaire=room.IDs[index===0 ? 1 : 0];
+        socket.to(adversaire).emit("abandonAdverse",(data.pseudo));
+    });
+
+    socket.on("reset",(roomID)=>{
+        let room=rooms[roomID];
+        if(!room) return;
+        room.votes.push(socket.id);
+
+        io.to(roomID).emit("aVote");
+
+        if(room.votes[room.votes.length-1]!==room.votes[0]){
+            io.to(roomID).emit("resetClient");
+            room.votes=[];
+            room.board=creerTabVide();
+            room.turn=Math.floor(Math.random() * 2) + 1;
+            io.to(roomID).emit("tourSuivant", (room.turn));
+
+        }
+    });
 });
 
 function checkWin(tab, joueur) {
