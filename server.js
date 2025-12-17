@@ -218,11 +218,11 @@ io.on("connection", (socket) => {
     });
 
     socket.on("rankedQueue",(data)=>{
-        if(rankedQueue.includes(data.localPlayerID)){
-            rankedQueue = rankedQueue.filter(id => id !== data.localPlayerID);
+        if(queue.includes(socket.id)){
+            queue = queue.filter(id => id !== socket.id);
         }
 
-        if(rankedQueue.includes(data.localPlayerID)) return;
+        if(rankedQueue.includes(socket.id)) return;
                 
         rankedQueue.push({
             socketID: data.localPlayerID,

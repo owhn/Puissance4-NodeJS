@@ -31,7 +31,7 @@ function deconnecter(){
     document.getElementById("blockConnect").hidden = false;
 }
 
-socket.on("nologin_ok",()=>{
+socket.on("nologin_ok",(data)=>{
     joueur.pseudo=data.pseudo;
     joueur.elo=data.elo;
 });
