@@ -256,6 +256,7 @@ io.on("connection", (socket) => {
 
     socket.on("quitterPartie",(roomID)=>{
         let room = rooms[roomID];
+        console.log(room.IDs[0])
         if(socket.id===room.IDs[0]){
             socket.emit("quitRoom");
             socket.to(room.IDs[1]).emit("delRoom");
@@ -302,6 +303,18 @@ io.on("connection", (socket) => {
         
         console.log(rooms[data.roomID]);
     });
+
+    socket.on("reset1",data=>{
+        io.to(data.roomID).emit("creset",".");
+    })
+
+    socket.on("aband",(data)=>{
+        let room=rooms[data.roomID];
+
+        if (data.localPlayerID === room.IDs[0]) io.to(data.roomID).emit("victoire",{pseudo: room.joueurs[1]});
+        if (data.localPlayerID === room.IDs[1]) io.to(data.roomID).emit("victoire",{pseudo: room.joueurs[0]});
+        
+    })
 
     socket.on("choix",(data)=>{
         let room=rooms[data.roomID];
@@ -397,6 +410,7 @@ io.on("connection", (socket) => {
         }
     });
 });
+
 
 function checkWin(tab, joueur) {
     const ROWS = 6;

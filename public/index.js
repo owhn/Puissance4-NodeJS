@@ -22,6 +22,7 @@ socket.on("setJoueur",(data)=>{
 
 
 
+
 //BDD :
 
 function deconnecter(){
@@ -103,7 +104,11 @@ socket.on("sendRoom", (data) => {
     //document.getElementById("InfoJ1").textContent = joueur.pseudo;
 });
 
+let jj1,jj2;
+
 socket.on("txtpseudo",(data,turn)=>{
+    jj1 = data[0];
+    jj2 = data[1];
     document.getElementById("infoJ1").textContent = data[0]
     document.getElementById("infoJ2").textContent = data[1]
     if (turn === 1) {
@@ -114,8 +119,70 @@ socket.on("txtpseudo",(data,turn)=>{
         document.getElementById("J2T").hidden = false;
         document.getElementById("J1T").hidden = true;
     }
+    selectTheme();
 
 })
+
+function majPseudo(){
+
+}
+
+let th;
+
+function selectTheme() {
+    const theme = document.getElementById("theme").value;
+    
+    document.body.classList.remove("theme-spider", "theme-bk", "theme-gf");
+    document.body.classList.add("theme-" + theme);
+    document.body.classList.add(joueur.pseudo === jj1 ? "jj1" : "jj2");
+
+    let cases = document.querySelectorAll("#plateau div");
+    for (let c of cases) {
+
+        if (theme === "spider") {
+    
+            if (c.classList.contains("kaaris") || c.classList.contains("gf")) {
+                c.classList.remove("kaaris", "gf");
+                c.classList.add("rouge");
+            }
+    
+            if (c.classList.contains("booba") || c.classList.contains("pgf")) {
+                c.classList.remove("booba", "pgf");
+                c.classList.add("jaune");
+            }
+        }
+    
+        if (theme === "bk") {
+    
+            if (c.classList.contains("rouge") || c.classList.contains("gf")) {
+                c.classList.remove("rouge", "gf");
+                c.classList.add("kaaris");
+            }
+    
+            if (c.classList.contains("jaune") || c.classList.contains("pgf")) {
+                c.classList.remove("jaune", "pgf");
+                c.classList.add("booba");
+            }
+        }
+    
+        if (theme === "gf") {
+    
+            if (c.classList.contains("kaaris") || c.classList.contains("rouge")) {
+                c.classList.remove("kaaris", "rouge");
+                c.classList.add("gf");
+            }
+    
+            if (c.classList.contains("booba") || c.classList.contains("jaune")) {
+                c.classList.remove("booba", "jaune");
+                c.classList.add("pgf");
+            }
+        }
+    }
+    
+    console.log("test jj1 :"+jj1)
+    console.log("test joueur.pseudo : "+ joueur.pseudo)
+    th = theme
+}
 
 socket.on("top5",(data)=>{
     document.getElementById("t1").textContent = "1 - "+data[0].pseudo+" : "+data[0].elo;
@@ -185,6 +252,10 @@ function resetClient(){
     document.getElementById("reset").style.backgroundColor="#56b6ff";
 }
 
+socket.on("creset",data=>{
+    compte.style.backgroundColor = "#21fc33";
+
+})
 
 socket.on("aVote",()=>{
     document.getElementById("reset").style.backgroundColor="#e0ba38";
@@ -196,6 +267,7 @@ function creerRoom(){
         pseudo: joueur.pseudo,
         localPlayerID: joueur.localPlayerID                    
     });
+
 }
 
 function trouverRoom(){
@@ -258,8 +330,16 @@ socket.on("placement",(data)=>{
     let idPos="";
     idPos=data.col+data.ligne;
     let div=document.getElementById(idPos);
-    if(data.player===1) div.classList.add("rouge");
-    else div.classList.add("jaune");
+    if(data.player===1){
+        if(th === "spider") div.classList.add("rouge");
+        if(th === "bk") div.classList.add("kaaris");
+        if(th === "gf") div.classList.add("gf")
+    }
+    else{
+        if(th === "spider") div.classList.add("jaune");
+        if(th === "bk") div.classList.add("booba");
+        if(th === "gf") div.classList.add("pgf")
+    } 
 });
 
 socket.on("colPleine",(colonnePleine)=>{
@@ -268,7 +348,9 @@ socket.on("colPleine",(colonnePleine)=>{
 });
 
 socket.on("victoire",(data)=>{
-    console.log("gagnant : " + data.pseudo + " numJoueur :" + data.gagnant);
+    console.log("gagnant : " + data.pseudo);
+    document.getElementById("blockVictoire").hidden = false;
+    document.getElementById("victoire").textContent = "Le gagnant est : " + data.pseudo
     //clear le client ? ou proposer un rematch ? 
 });
 
