@@ -1,0 +1,7 @@
+COOKIE (navigateur)
+   ↓
+SESSION (serveur)
+   ↓
+socket.request.session
+   ↓
+session.user = joueur connecté

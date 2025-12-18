@@ -398,6 +398,13 @@ h1{
   
   .jj2.theme-gf .colonne:hover {
     background-image: url("jpgfj.png");
+  .zone-jeton.j1{
+    background: #e22525 url("sfspider.png") center/90% no-repeat;
+    border-color: white;
+  }
+  .zone-jeton.j2{
+    background: #ffe600 url("spidernoir.png") center/120% no-repeat;
+    border-color: white;
   }
 
 /*Boutons*/
@@ -551,6 +558,11 @@ h1{
     border-radius: 10px/10px;
     background-color: #d3f8ff ;
     box-shadow:  0px 0px 25px #d3f8ff;
+}
+
+button:active{
+    box-shadow: inset 3px 3px 8px rgba(0,0,0,0.4);
+    transform: translateY(2px);
 }
 
 
