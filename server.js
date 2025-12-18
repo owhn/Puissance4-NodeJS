@@ -16,9 +16,9 @@ app.use(express.static("public"));
 const sessionMiddleware = session({
     secret: "secret-test",
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: {
-        maxAge: 1000 * 60 * 60, // 1 heure
+        maxAge: 1000 * 60 * 60 , // 1 heure
         secure:false
     }
 });
@@ -86,31 +86,17 @@ io.on("connection", (socket) => {
 
     if (session.joueur) {
         socket.emit("login_ok", session.joueur);
+        session.save();
     }
-    else{
-        session.joueur = {
-            pseudo: "Invite "+socket.id.substring(15),
-            elo: 0
-        }
-        console.log("nouvelle connexion : ", session.joueur.pseudo);
+    else socket.emit("guest");
         
-        socket.emit("setJoueur",{
-            pseudo: session.pseudo,
-            elo: session.elo
-        });
-    }
 
+    if (!session.views) session.views = 1;
+    else session.views++;
     
-
-    if (!session.views) {
-        session.views = 1;
-    } else {
-        session.views++;
-    }
 
     socket.emit("views", session.views);
     
-    session.save();
 
     
 
@@ -128,16 +114,9 @@ io.on("connection", (socket) => {
 
     socket.on("nologin",()=>{
         delete session.joueur;
-        session.joueur = {
-            pseudo: "Invite "+socket.id.substring(15),
-            elo: 0
-        }
-        socket.emit("nologin_ok",{
-            pseudo: session.joueur.pseudo,
-            elo: session.joueur.elo
-        });
+        socket.emit("guest");
         queue = queue.filter(pseudo => pseudo !== socket.id);
-        rankedQueue = rankedQueue.filter(rQ => rQ.socket.id !== socket.id);
+        rankedQueue = rankedQueue.filter(rQ => rQ.socketID !== socket.id);
     });
 
 
@@ -155,6 +134,7 @@ io.on("connection", (socket) => {
                     pseudo: data.pseudo,
                     elo: elo
                 }
+                session.initialized = true;
                 session.save();
 
                 socket.emit("login_ok", (session.joueur));
@@ -218,6 +198,8 @@ io.on("connection", (socket) => {
     });
 
     socket.on("rankedQueue",(data)=>{
+        if (!session.joueur) return;
+
         if(queue.includes(socket.id)){
             queue = queue.filter(id => id !== socket.id);
         }
@@ -233,6 +215,8 @@ io.on("connection", (socket) => {
     });
 
     socket.on("joinRoomRanked", (data)=>{
+        if (!session.joueur) return;
+
         socket.join(data.roomID);
 
         if(!rooms[data.roomID]){

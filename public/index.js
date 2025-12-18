@@ -15,12 +15,12 @@ const joueur = {
 const socket = io();
 
 
-socket.on("setJoueur",(data)=>{
-    joueur.pseudo=data.pseudo;
-    joueur.elo=data.elo;
-})
 
-
+socket.on("guest", () => {
+    joueur.pseudo = "Invite " + socket.id.substring(7, 12);
+    joueur.elo = 0;
+    console.log("mode invité :", joueur.pseudo);
+});
 
 
 //BDD :
