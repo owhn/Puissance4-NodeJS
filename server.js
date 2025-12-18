@@ -6,21 +6,38 @@ const express = require("express");
 const http = require("http");
 const socket = require("socket.io");
 const bdd = require("./bdd.js")
+const session = require("express-session");
 
 const PORT = process.env.PORT || 3000; //3000 si port non imposé mais si imposé, process.env.PORT s'occupe de tout
 const app = express(); //Initialisation express
 app.use(express.static("public"));
 
+// gerer les sessions (coeur de la session)
+const sessionMiddleware = session({
+    secret: "secret-test",
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        maxAge: 1000 * 60 * 60, // 1 heure
+        secure:false
+    }
+});
+
+app.use(sessionMiddleware);
+
+
+
+
 const server = http.createServer(app); //Création serveur http
 const io = socket(server); //Initialisation de socket.io
 
-let alrConnected=[];
 
 const rooms = {
     joueurs: [],
     IDs: [],
     elo: [],
     votes: [],
+    votesNul: [],
     turn: 0,
     board: creerTabVide()
 }; //rooms[roomID] = {joueurs = [pseudoJ1, pseudoJ2] , ID = [localPlayerIDs]}R
@@ -55,47 +72,93 @@ function genRoomIDpv() {
     return id;
 }
 
-
+io.use((socket, next) => {
+    sessionMiddleware(socket.request, {}, next);
+});
 
 io.on("connection", (socket) => {
-    console.log("client connecté " + socket.id);
+    const session = socket.request.session;
+
+    // session.joueur = {
+    //     pseudo,
+    //     elo
+    // }
+
+    if (session.joueur) {
+        socket.emit("login_ok", session.joueur);
+    }
+    else{
+        session.joueur = {
+            pseudo: "Invite "+socket.id.substring(15),
+            elo: 0
+        }
+        console.log("nouvelle connexion : ", session.joueur.pseudo);
+        
+        socket.emit("setJoueur",{
+            pseudo: session.pseudo,
+            elo: session.elo
+        });
+    }
+
+    
+
+    if (!session.views) {
+        session.views = 1;
+    } else {
+        session.views++;
+    }
+
+    socket.emit("views", session.views);
+    
+    session.save();
+
+    
+
 
     socket.on("disconnect", () => {
-        console.log("Déconnexion :", socket.id);
         queue = queue.filter(id => id !== socket.id); //enlever le joueur des queues
-        rankedQueue = rankedQueue.filter(j => j.socket.id !== socket.id);
+        rankedQueue = rankedQueue.filter(rQ => rQ.socketID !== socket.id);
         let roomID=socket.roomID;
-        io.to(roomID).emit("delRoom");
-        delete rooms[roomID];
-        console.log("room " + roomID + " supprimée");
+        if(rooms[roomID]) {
+            io.to(roomID).emit("delRoom");
+            delete rooms[roomID];
+            console.log("room " + roomID + " supprimée");
+        }
     });
 
-    socket.on("nologin",(data)=>{
-        alrConnected = alrConnected.filter(user => user !== data);
+    socket.on("nologin",()=>{
+        delete session.joueur;
+        session.joueur = {
+            pseudo: "Invite "+socket.id.substring(15),
+            elo: 0
+        }
+        socket.emit("nologin_ok",{
+            pseudo: session.joueur.pseudo,
+            elo: session.joueur.elo
+        });
+        queue = queue.filter(pseudo => pseudo !== socket.id);
+        rankedQueue = rankedQueue.filter(rQ => rQ.socket.id !== socket.id);
     });
 
-    socket.on("newClient",(data)=>{
-        socket.emit("setLocalPlayerID",(socket.id));    
-    });
 
     socket.on("connexionCompte", async (data)=>{
         console.log("connexionCompte p/m : " +data.pseudo + " " + data.mdp);
-        if (alrConnected.includes(data.pseudo)){
-            socket.emit("dejaConnecte",(data.pseudo));
-            console.log("deja connecte");
-            return;
-        }
         try {
             const result = await bdd.loginUser(data.pseudo,data.mdp);
-            console.log("after bdd.loginUser");
             if(!result.ok){
                 socket.emit("erreurBDD", "login pas ok");
             }
             else if (result.ok){
                 const elo = await bdd.getElo(data.pseudo);
-                socket.emit("login_ok", {pseudo : data.pseudo, elo});
-                console.log("login_ok");
-                alrConnected.push(data.pseudo);
+
+                session.joueur={
+                    pseudo: data.pseudo,
+                    elo: elo
+                }
+                session.save();
+
+                socket.emit("login_ok", (session.joueur));
+                console.log("login_ok : ", session.joueur.pseudo);
             }
         }catch(e){
             socket.emit("erreurBDD", e);
@@ -109,20 +172,19 @@ io.on("connection", (socket) => {
             socket.emit("register_ok", {pseudo : data.pseudo, mdp : data.mdp});
             console.log("register_ok");
         } catch (e) {
-            console.log("catch creerCompte");
             socket.emit("erreurBDD", e);
         }
     });
 
-    socket.on("queue",(localPlayerID)=>{
-        if(rankedQueue.includes(localPlayerID)){
-            rankedQueue = rankedQueue.filter(id => id !== localPlayerID);
+    socket.on("queue",()=>{
+        if(rankedQueue.includes(socket.id)){
+            rankedQueue = rankedQueue.filter(rQ => rQ.socketID !== socket.id);
         }
 
-        if(queue.includes(localPlayerID)) return;        
+        if(queue.includes(socket.id)) return;        
 
-        queue.push(localPlayerID);
-        console.log("longueur de la queue : "+queue.length+"cm");
+        queue.push(socket.id);
+        console.log("longueur de la queue : " + queue.length);
 
         if (queue.length >= 2){
             let roomID = genRoomID();
@@ -145,7 +207,7 @@ io.on("connection", (socket) => {
             };
         }
         rooms[data.roomID].joueurs.push(data.pseudo);
-        rooms[data.roomID].IDs.push(data.localPlayerID);
+        rooms[data.roomID].IDs.push(socket.id);
         let tour=Math.floor(Math.random() * 2) + 1;
         rooms[data.roomID].turn = tour;
         
@@ -156,11 +218,11 @@ io.on("connection", (socket) => {
     });
 
     socket.on("rankedQueue",(data)=>{
-        if(rankedQueue.includes(data.localPlayerID)){
-            rankedQueue = rankedQueue.filter(id => id !== data.localPlayerID);
+        if(queue.includes(socket.id)){
+            queue = queue.filter(id => id !== socket.id);
         }
 
-        if(rankedQueue.includes(data.localPlayerID)) return;
+        if(rankedQueue.includes(socket.id)) return;
                 
         rankedQueue.push({
             socketID: data.localPlayerID,
@@ -184,7 +246,7 @@ io.on("connection", (socket) => {
             };
         }
         rooms[data.roomID].joueurs.push(data.pseudo);
-        rooms[data.roomID].IDs.push(data.localPlayerID);
+        rooms[data.roomID].IDs.push(socket.id);
         rooms[data.roomID].elo.push(data.elo);
         let tour=Math.floor(Math.random() * 2) + 1;
         rooms[data.roomID].turn = tour;     
@@ -299,6 +361,41 @@ io.on("connection", (socket) => {
         io.to(data.roomID).emit("tourSuivant", (room.turn));
     });
 
+    socket.on("abandon",(data)=>{
+        console.log(data.pseudo + " a abandonné");
+        room=rooms[data.roomID];
+        let index=room.joueurs.indexOf(data.pseudo);
+        
+        if (index === -1) {
+            console.log("joueur introuvable dans la room");
+            return;
+        }
+        
+        if (room.joueurs.length < 2) {
+            console.log("pas d'adversaire");
+            return;
+        }
+
+        let adversaire=room.IDs[index===0 ? 1 : 0];
+        socket.to(adversaire).emit("abandonAdverse",(data.pseudo));
+    });
+
+    socket.on("reset",(roomID)=>{
+        let room=rooms[roomID];
+        if(!room) return;
+        room.votes.push(socket.id);
+
+        io.to(roomID).emit("aVote");
+
+        if(room.votes[room.votes.length-1]!==room.votes[0]){
+            io.to(roomID).emit("resetClient");
+            room.votes=[];
+            room.board=creerTabVide();
+            room.turn=Math.floor(Math.random() * 2) + 1;
+            io.to(roomID).emit("tourSuivant", (room.turn));
+
+        }
+    });
 });
 
 function checkWin(tab, joueur) {

@@ -6,22 +6,18 @@ let roomID,turn;
 let pseudo,mdp;
 
 const joueur = {
-    localPlayerID: "",
+    PlayerID: "",
     pseudo: "",
     elo: 0
 };
 
 
 const socket = io();
-socket.on('connect', (data) => {
-    socket.emit("newClient",(data));
-});
 
-socket.on("setLocalPlayerID",(data)=>{
-    joueur.localPlayerID=data;
-    console.log("localPlayerID : " + joueur.localPlayerID);
-    joueur.pseudo="Invite "+joueur.localPlayerID.substring(15);
-    console.log(joueur.pseudo);
+
+socket.on("setJoueur",(data)=>{
+    joueur.pseudo=data.pseudo;
+    joueur.elo=data.elo;
 })
 
 
@@ -30,12 +26,15 @@ socket.on("setLocalPlayerID",(data)=>{
 
 function deconnecter(){
     socket.emit("nologin",(joueur.pseudo));
-    joueur.pseudo="Invite "+joueur.localPlayerID.substring(15);
-    joueur.elo = 0;
+
     document.getElementById("blockDeconnect").hidden = true
     document.getElementById("blockConnect").hidden = false;
 }
 
+socket.on("nologin_ok",(data)=>{
+    joueur.pseudo=data.pseudo;
+    joueur.elo=data.elo;
+});
 
 function connexionCompte(){
     // console.log("connexionCompte");
@@ -51,9 +50,9 @@ socket.on("login_ok", (data)=>{
     joueur.elo=data.elo;
     console.log("login ok : "+data.pseudo+ " " + data.elo);
     document.getElementById("pseudo").textContent=joueur.pseudo;
+    if(joueur.pseudo.substring(0,6)==="Invite") return;
     document.getElementById("blockDeconnect").hidden = false;
     document.getElementById("blockConnect").hidden = true;
-
 });
 
 socket.on("dejaConnecte", (data)=>{
@@ -82,7 +81,7 @@ socket.on("erreurBDD",(msg)=>{
 //Matchmaking :
 
 function qPartie(){
-    socket.emit("queue",(joueur.localPlayerID));
+    socket.emit("queue",(joueur.pseudo));
 }
 
 socket.on("sendRoom", (data) => {
@@ -124,11 +123,10 @@ socket.on("top5",(data)=>{
     document.getElementById("t3").textContent = "3 - "+data[2].pseudo+" : "+data[2].elo;
     document.getElementById("t4").textContent = "4 - "+data[3].pseudo+" : "+data[3].elo;
     document.getElementById("t5").textContent = "5 - "+data[4].pseudo+" : "+data[4].elo;
-
 })
 
 function qClasse(){
-    if(joueur.elo>0) socket.emit("rankedQueue",{localPlayerID: joueur.localPlayerID, elo: joueur.elo});
+    if(joueur.elo>0) socket.emit("rankedQueue");
     else {
         document.getElementById("btnRanked").textContent="Se connecter pour jouer en ranked";
     }
@@ -143,16 +141,55 @@ socket.on("sendRoomRanked", (data) => {
         localPlayerID : joueur.localPlayerID,
         elo : joueur.elo
     });
+    document.getElementById("partieG").hidden = true;
+    document.getElementById("dansPartie").hidden = false;
+    document.getElementById("dansPartieD").hidden = false;
+    document.getElementById("blockConnect").hidden = true;
+    document.getElementById("blockDeconnect").hidden = true;
+    document.getElementById("PARTIE").hidden = false;
+    document.getElementById("pseudoP").textContent = joueur.pseudo
+    document.getElementById("code").textContent = roomID.substring(4)
 });
 
+let abandonner=0;
 function abandon(){
+    abandonner+=1;
+    document.getElementById("Abandon").style.backgroundColor="green";
+    if(abandonner>=2){
+        abandonner=0;
+        socket.emit("abandon",{pseudo: joueur.pseudo,roomID});
+        document.getElementById("Abandon").style.backgroundColor="#ec3c30";
+    }
+}   
 
-}
+socket.on("abandonAdverse",(data)=>{
+    console.log(data + " a abandonné");
+});
 
 function reset(){
-
+    socket.emit("reset",(roomID));
 }
 
+socket.on("resetClient",()=>{
+    document.querySelectorAll(".zone-jeton").forEach(div => {
+        div.classList.remove("rouge", "jaune", "booba", "kaaris", "gf", "pgf");//ajouter si autres classes
+    });
+    document.getElementById("reset").style.backgroundColor="#56b6ff";
+
+});
+
+function resetClient(){
+    document.querySelectorAll(".zone-jeton").forEach(div => {
+        div.classList.remove("rouge", "jaune", "booba", "kaaris", "gf", "pgf");//ajouter si autres classes
+    });
+    document.getElementById("reset").style.backgroundColor="#56b6ff";
+}
+
+
+socket.on("aVote",()=>{
+    document.getElementById("reset").style.backgroundColor="#e0ba38";
+    console.log("quelqu'un a voté pour reset");
+});
 
 function creerRoom(){
     socket.emit("creerRoom",{
@@ -181,10 +218,27 @@ function quitterPartie(){
 
 socket.on("quitRoom",()=>{
     console.log("partie quittée");
+    document.getElementById("partieG").hidden = 0;
+    document.getElementById("dansPartie").hidden = 1;
+    document.getElementById("dansPartieD").hidden = 1;
+    if(joueur.elo===0) document.getElementById("blockConnect").hidden = 0;
+    else document.getElementById("blockDeconnect").hidden = 0;
+    document.getElementById("PARTIE").hidden = 1;
+    document.getElementById("code").textContent = roomID.substring(4);
+    resetClient();
 });
+
 
 socket.on("delRoom",()=>{
     console.log("room supprimée");
+    document.getElementById("partieG").hidden = 0;
+    document.getElementById("dansPartie").hidden = 1;
+    document.getElementById("dansPartieD").hidden = 1;
+    if(joueur.elo===0) document.getElementById("blockConnect").hidden = 0;
+    else document.getElementById("blockDeconnect").hidden = 0;
+    document.getElementById("PARTIE").hidden = 1;
+    document.getElementById("code").textContent = roomID.substring(4);
+    resetClient();
 });
 
 //fonctions du jeu en soi
@@ -196,12 +250,16 @@ function colChoix(col){
     });
 }
 
+socket.on("views",(views)=>{
+    console.log("views", views);
+})
+
 socket.on("placement",(data)=>{
     let idPos="";
     idPos=data.col+data.ligne;
     let div=document.getElementById(idPos);
-    if(data.player===1) div.style.backgroundColor="red";
-    else div.style.backgroundColor="yellow";
+    if(data.player===1) div.classList.add("rouge");
+    else div.classList.add("jaune");
 });
 
 socket.on("colPleine",(colonnePleine)=>{
@@ -216,7 +274,7 @@ socket.on("victoire",(data)=>{
 
 socket.on("nul",()=>{
     console.log("Match nul");
-    //clear le client
+    reset();
 });
 
 socket.on("tourSuivant",(tour)=>{
@@ -231,3 +289,4 @@ socket.on("tourSuivant",(tour)=>{
         document.getElementById("J1T").hidden = true;
     }
 });
+
