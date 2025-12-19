@@ -361,15 +361,7 @@ h1{
     border-color: white;
   }
 
-  .board div.gf {
-    background: #e22525 url("gf.png") center/170% no-repeat;
-    border-color: white;
-  }
 
-  .board div.pgf {
-    background: #ffe600 url("pgf.png") center/150% no-repeat;
-    border-color: white;
-  }
 
 
   /* SPIDER */
@@ -391,14 +383,6 @@ h1{
     background-image: url("jboobaj.png");
   }
   
-  /* GF */
-  .jj1.theme-gf .colonne:hover {
-    background-image: url("jgfr.png");
-  }
-  
-  .jj2.theme-gf .colonne:hover {
-    background-image: url("jpgfj.png");
-  }
 
 
 
