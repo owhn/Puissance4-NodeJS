@@ -47,10 +47,10 @@ async function getElo(pseudo){
 }
 
 async function updateElo(pseudo, newElo){
-    const [rows]=await bdd.execute("UPDATE p4_elo SET elo=? WHERE pseudo=?",
+    await bdd.execute("UPDATE p4_elo JOIN p4_joueurs ON p4_elo.id_joueur=p4_joueurs.id SET p4_elo.elo= p4_elo.elo + ? WHERE p4_joueurs.pseudo=?",
     [newElo,pseudo]);
-    return rows[0].elo;
 }
+
 async function top(){
     const rows = []
     const [lignes] = await bdd.execute("SELECT p4_joueurs.pseudo, p4_elo.elo FROM p4_joueurs JOIN p4_elo ON p4_joueurs.id = p4_elo.id_joueur ORDER BY elo DESC");
