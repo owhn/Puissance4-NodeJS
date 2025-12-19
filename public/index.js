@@ -2,6 +2,7 @@
 //BACK END : Antoine
 //Je vais mettre ici toutes les fonctions (pour les boutons) que tu lieras au html, on associera le styleClient.js à ce fichier*
 
+
 let roomID,turn;
 let pseudo,mdp;
 
@@ -51,6 +52,7 @@ function connexionCompte(){
     socket.emit("connexionCompte",{pseudo,mdp});
 }
 
+
 socket.on("login_ok", (data)=>{
     joueur.pseudo=data.pseudo;
     joueur.elo=data.elo;
@@ -60,6 +62,7 @@ socket.on("login_ok", (data)=>{
     if(joueur.pseudo.substring(0,6)==="Invite") return;
     document.getElementById("blockDeconnect").hidden = false;
     document.getElementById("blockConnect").hidden = true;
+    document.getElementById("modifCompte").hidden = true;
 });
 
 socket.on("dejaConnecte", (data)=>{
@@ -77,7 +80,12 @@ function creerCompte(){
 
 socket.on("register_ok", (data)=>{
     console.log("création de compte OK ! : " +data.pseudo + " " + data.mdp);
+    joueur.pseudo=data.pseudo;
     connexionCompte();
+});
+
+socket.on("chCompte_ok",(data)=>{
+    socket.emit("connexionCompte",{pseudo: data.pseudo,mdp: data.mdp});
 });
 
 socket.on("erreurBDD",(msg)=>{
@@ -197,6 +205,19 @@ socket.on("top5",(data)=>{
     document.getElementById("t5").textContent = "5 - "+data[4].pseudo+" : "+data[4].elo;
 })
 
+
+
+function chCompte(){
+    let apseudo = document.getElementById("txtPseudoM").value;
+    let amdp = document.getElementById("txtMdpM").value;
+    let npseudo = document.getElementById("newPseudo").value;
+    let nmdp = document.getElementById("newMdp").value;
+
+
+    socket.emit("modiff",{apseudo:apseudo,amdp:amdp,npseudo:npseudo,nmdp:nmdp})
+
+}
+
 function qClasse(){
     if(joueur.elo>0) socket.emit("rankedQueue",(joueur.pseudo));
     else {
@@ -222,6 +243,7 @@ socket.on("sendRoomRanked", (data) => {
     document.getElementById("pseudoP").textContent = joueur.pseudo
     document.getElementById("code").textContent = roomID.substring(4)
     document.getElementById("quitPartie").hidden = true;
+    document.getElementById("dansPartie").style.height = "90px";
 });
 
 let abandonner=0;
@@ -299,6 +321,9 @@ function trouverRoom(){
 socket.on("roomPV_ok",(data)=>{
     console.log("room : " + data);
     roomID=data;
+    document.getElementById("partieG").hidden = true;
+    document.getElementById("dansPartie").hidden = false;
+    document.getElementById("code").textContent = roomID.substring(4)
 });
 
 function quitterPartie(){

@@ -166,6 +166,10 @@ io.on("connection", (socket) => {
         session.save();
     });
 
+    socket.on("modiff",async (data)=>{
+        let x=await bdd.updateCompte(data.apseudo,data.amdp,data.npseudo,data.nmdp);
+        if(x) socket.emit("chCompte_ok", {pseudo : data.npseudo, mdp : data.nmdp});
+    })
 
     socket.on("connexionCompte", async (data)=>{
         console.log("connexionCompte p/m : " +data.pseudo + " " + data.mdp);
@@ -295,6 +299,7 @@ io.on("connection", (socket) => {
 
         io.to(data.roomID).emit("txtpseudo",(rooms[data.roomID].joueurs),(rooms[data.roomID].turn))
         socket.roomID=data.roomID;
+        io.to(data.roomID).emit("txtpseudo",(rooms[data.roomID].joueurs),(rooms[data.roomID].turn))
         //console.log("Room", data.roomID, rooms[data.roomID]);
     });
 

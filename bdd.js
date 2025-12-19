@@ -63,11 +63,23 @@ async function top(){
     return rows
 }
 
+async function updateCompte(apseudo,amdp,npseudo,nmdp){
+
+    const user = await getUser(npseudo);
+
+    if (user  && apseudo !== npseudo) return 0;
+
+    const [lignes] = await bdd.execute("UPDATE p4_joueurs SET pseudo = '"+npseudo+"', password = '"+nmdp+"' WHERE pseudo = '"+apseudo+"' AND password = '"+amdp+"'");
+
+    return 1;
+}
+
 module.exports = {
     connexion,
     createUser,
     loginUser,
     getElo,
     updateElo,
-    top
+    top,
+    updateCompte
 };
