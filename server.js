@@ -16,15 +16,24 @@ app.use(express.static("public"));
 const sessionMiddleware = session({
     secret: "secret-test",
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: {
-        maxAge: 1000 * 60 * 60, // 1 heure
+        maxAge: 1000 * 60 * 60 , // 1 heure
         secure:false
     }
 });
 
 app.use(sessionMiddleware);
 
+
+//route http qui initialise la session
+app.get("/init-session", (req, res) => {
+    if (!req.session.initialized) {
+        req.session.initialized = true;
+        req.session.save();
+    }
+    res.sendStatus(200);
+});
 
 
 
@@ -44,6 +53,7 @@ const rooms = {
 
 let rankedQueue = [];// joueur : {socketID, elo,timestamp:Date.now()}
 let queue = [];// socketID
+let jEnJeu = [];// pseudos de joueurs en jeu
 
 function creerTabVide(){
     return [
@@ -86,31 +96,17 @@ io.on("connection", (socket) => {
 
     if (session.joueur) {
         socket.emit("login_ok", session.joueur);
+        session.save();
     }
-    else{
-        session.joueur = {
-            pseudo: "Invite "+socket.id.substring(15),
-            elo: 0
-        }
-        console.log("nouvelle connexion : ", session.joueur.pseudo);
+    else socket.emit("guest");
         
-        socket.emit("setJoueur",{
-            pseudo: session.pseudo,
-            elo: session.elo
-        });
-    }
 
+    if (!session.views) session.views = 1;
+    else session.views++;
     
-
-    if (!session.views) {
-        session.views = 1;
-    } else {
-        session.views++;
-    }
 
     socket.emit("views", session.views);
     
-    session.save();
 
     
 
@@ -121,6 +117,8 @@ io.on("connection", (socket) => {
         let roomID=socket.roomID;
         if(rooms[roomID]) {
             io.to(roomID).emit("delRoom");
+            jEnJeu=jEnJeu.filter(pseudo => pseudo !==room.joueurs[0]);
+            jEnJeu=jEnJeu.filter(pseudo => pseudo !==room.joueurs[1]);
             delete rooms[roomID];
             console.log("room " + roomID + " supprimée");
         }
@@ -128,16 +126,11 @@ io.on("connection", (socket) => {
 
     socket.on("nologin",()=>{
         delete session.joueur;
-        session.joueur = {
-            pseudo: "Invite "+socket.id.substring(15),
-            elo: 0
-        }
-        socket.emit("nologin_ok",{
-            pseudo: session.joueur.pseudo,
-            elo: session.joueur.elo
-        });
+        socket.emit("guest");
         queue = queue.filter(pseudo => pseudo !== socket.id);
-        rankedQueue = rankedQueue.filter(rQ => rQ.socket.id !== socket.id);
+        rankedQueue = rankedQueue.filter(rQ => rQ.socketID !== socket.id);
+        session.initialized = false;
+        session.save();
     });
 
 
@@ -155,6 +148,7 @@ io.on("connection", (socket) => {
                     pseudo: data.pseudo,
                     elo: elo
                 }
+                session.initialized = true;
                 session.save();
 
                 socket.emit("login_ok", (session.joueur));
@@ -176,7 +170,11 @@ io.on("connection", (socket) => {
         }
     });
 
-    socket.on("queue",()=>{
+    socket.on("queue",(pseudo)=>{
+        if(jEnJeu.includes(pseudo)) {
+            console.log(jEnJeu);
+            return;
+        }
         if(rankedQueue.includes(socket.id)){
             rankedQueue = rankedQueue.filter(rQ => rQ.socketID !== socket.id);
         }
@@ -207,6 +205,7 @@ io.on("connection", (socket) => {
             };
         }
         rooms[data.roomID].joueurs.push(data.pseudo);
+        jEnJeu.push(data.pseudo);
         rooms[data.roomID].IDs.push(socket.id);
         let tour=Math.floor(Math.random() * 2) + 1;
         rooms[data.roomID].turn = tour;
@@ -217,7 +216,13 @@ io.on("connection", (socket) => {
         socket.roomID=data.roomID;
     });
 
-    socket.on("rankedQueue",(data)=>{
+    socket.on("rankedQueue",(pseudo)=>{
+        if(jEnJeu.includes(pseudo)) {
+            console.log(jEnJeu);
+            return;
+        }
+        if (!session.joueur) return;
+
         if(queue.includes(socket.id)){
             queue = queue.filter(id => id !== socket.id);
         }
@@ -225,14 +230,16 @@ io.on("connection", (socket) => {
         if(rankedQueue.includes(socket.id)) return;
                 
         rankedQueue.push({
-            socketID: data.localPlayerID,
-            elo: data.elo,
+            socketID: socket.id,
+            elo: session.joueur.elo,
             timeJoined: Date.now()
         });
         console.log("longueur de la rankedQueue : "+rankedQueue.length+"cm");
     });
 
     socket.on("joinRoomRanked", (data)=>{
+        if (!session.joueur) return;
+
         socket.join(data.roomID);
 
         if(!rooms[data.roomID]){
@@ -246,6 +253,7 @@ io.on("connection", (socket) => {
             };
         }
         rooms[data.roomID].joueurs.push(data.pseudo);
+        jEnJeu.push(data.pseudo);
         rooms[data.roomID].IDs.push(socket.id);
         rooms[data.roomID].elo.push(data.elo);
         let tour=Math.floor(Math.random() * 2) + 1;
@@ -256,7 +264,6 @@ io.on("connection", (socket) => {
 
     socket.on("quitterPartie",(roomID)=>{
         let room = rooms[roomID];
-        console.log(room.IDs[0])
         if(socket.id===room.IDs[0]){
             socket.emit("quitRoom");
             socket.to(room.IDs[1]).emit("delRoom");
@@ -265,7 +272,8 @@ io.on("connection", (socket) => {
             socket.to(room.IDs[0]).emit("quitRoom");
             socket.emit("delRoom");
         }
-        
+        jEnJeu=jEnJeu.filter(pseudo => pseudo !==room.joueurs[0]);
+        jEnJeu=jEnJeu.filter(pseudo => pseudo !==room.joueurs[1]);
         delete rooms[roomID];
     });
 
@@ -316,7 +324,7 @@ io.on("connection", (socket) => {
         
     })
 
-    socket.on("choix",(data)=>{
+    socket.on("choix", async (data)=>{
         let room=rooms[data.roomID];
         let col=data.col;
         let charCol = ['A','B','C','D','E','F','G'];
@@ -356,6 +364,34 @@ io.on("connection", (socket) => {
                 pseudo: room.joueurs[playerNumber-1]
             });
             room.turn=1;
+            try{
+                let gagnantIndex=playerNumber-1;
+                let perdantIndex;
+                if(gagnantIndex===0) perdantIndex=1;
+                else perdantIndex=0;
+                
+                if (!room.elo[gagnantIndex] || !room.elo[perdantIndex]) throw ("ERR : elo manquant");
+                console.log("eloG dans room : ",room.elo[gagnantIndex],"\neloP dans room :",room.elo[perdantIndex]);
+                eloDiff=Math.abs(room.elo[gagnantIndex]-room.elo[perdantIndex]);
+                let eloW=30;
+                let eloL=-30;
+
+                let surDiff = 0;
+                for (let i = (-eloDiff);i<0;i+=10){
+                    surDiff += 1;
+                    eloW += 1 + surDiff/15;
+                    eloL -= 1 + surDiff/15;
+                }
+                
+ 
+                console.log("eloW : ", eloW,"\neloL : ", eloL);
+                await bdd.updateElo(room.joueurs[gagnantIndex],eloW);
+                await bdd.updateElo(room.joueurs[perdantIndex],eloL);
+            }
+            catch (e){
+                console.error(e);
+                io.to(socket.roomID).emit("erreurBDD", "echec de l'update de l'elo");
+            }
             return;
         }
 
@@ -497,8 +533,8 @@ setInterval(classement,1000)
 
 async function Demarrage(){
     await bdd.connexion();
-    server.listen(PORT, "localhost",()=>{
-        console.log("serv démarré : http://localhost:"+PORT);
+    server.listen(PORT, "10.187.52.55",()=>{
+        console.log("serv démarré : http://10.187.52.55:"+PORT);
     });
 };
 
