@@ -216,12 +216,14 @@ socket.on("sendRoomRanked", (data) => {
     document.getElementById("PARTIE").hidden = false;
     document.getElementById("pseudoP").textContent = joueur.pseudo
     document.getElementById("code").textContent = roomID.substring(4)
+    document.getElementById("quitPartie").hidden = true;
 });
 
 let abandonner=0;
 function abandon(){
     abandonner+=1;
     document.getElementById("Abandon").style.backgroundColor="green";
+    document.getElementById("ab").textContent = "Sur ? "
     if(abandonner>=2){
         abandonner=0;
         socket.emit("abandon",{pseudo: joueur.pseudo,roomID});
@@ -286,6 +288,7 @@ socket.on("roomPV_ok",(data)=>{
 
 function quitterPartie(){
     socket.emit("quitterPartie",(roomID));
+
 }
 
 socket.on("quitRoom",()=>{
