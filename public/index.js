@@ -11,16 +11,18 @@ const joueur = {
     elo: 0
 };
 
+//appel de la route pour initialiser la session
+fetch("/init-session");
 
 const socket = io();
 
 
-socket.on("setJoueur",(data)=>{
-    joueur.pseudo=data.pseudo;
-    joueur.elo=data.elo;
-})
 
-
+socket.on("guest", () => {
+    joueur.pseudo = "Invite " + socket.id.substring(7, 12);
+    joueur.elo = 0;
+    console.log("mode invité :", joueur.pseudo);
+});
 
 
 //BDD :
@@ -54,6 +56,7 @@ socket.on("login_ok", (data)=>{
     joueur.elo=data.elo;
     console.log("login ok : "+data.pseudo+ " " + data.elo);
     document.getElementById("pseudo").textContent=joueur.pseudo;
+    document.getElementById("txtElo").textContent=joueur.elo+"🏆";
     if(joueur.pseudo.substring(0,6)==="Invite") return;
     document.getElementById("blockDeconnect").hidden = false;
     document.getElementById("blockConnect").hidden = true;
@@ -196,7 +199,7 @@ socket.on("top5",(data)=>{
 })
 
 function qClasse(){
-    if(joueur.elo>0) socket.emit("rankedQueue");
+    if(joueur.elo>0) socket.emit("rankedQueue",(joueur.pseudo));
     else {
         document.getElementById("btnRanked").textContent="Se connecter pour jouer en ranked";
     }
@@ -293,6 +296,7 @@ function quitterPartie(){
 
 socket.on("quitRoom",()=>{
     console.log("partie quittée");
+    document.getElementById("blockVictoire").hidden = true;
     document.getElementById("partieG").hidden = 0;
     document.getElementById("dansPartie").hidden = 1;
     document.getElementById("dansPartieD").hidden = 1;
@@ -306,6 +310,7 @@ socket.on("quitRoom",()=>{
 
 socket.on("delRoom",()=>{
     console.log("room supprimée");
+    document.getElementById("blockVictoire").hidden = true;
     document.getElementById("partieG").hidden = 0;
     document.getElementById("dansPartie").hidden = 1;
     document.getElementById("dansPartieD").hidden = 1;
