@@ -145,7 +145,7 @@ let th;
 function selectTheme() {
     const theme = document.getElementById("theme").value;
     
-    document.body.classList.remove("theme-spider", "theme-bk", "theme-gf");
+    document.body.classList.remove("theme-spider", "theme-bk");
     document.body.classList.add("theme-" + theme);
     document.body.classList.add(joueur.pseudo === jj1 ? "jj1" : "jj2");
 
@@ -154,42 +154,31 @@ function selectTheme() {
 
         if (theme === "spider") {
     
-            if (c.classList.contains("kaaris") || c.classList.contains("gf")) {
-                c.classList.remove("kaaris", "gf");
+            if (c.classList.contains("kaaris") ) {
+                c.classList.remove("kaaris");
                 c.classList.add("rouge");
             }
     
-            if (c.classList.contains("booba") || c.classList.contains("pgf")) {
-                c.classList.remove("booba", "pgf");
+            if (c.classList.contains("booba")) {
+                c.classList.remove("booba", );
                 c.classList.add("jaune");
             }
         }
     
         if (theme === "bk") {
     
-            if (c.classList.contains("rouge") || c.classList.contains("gf")) {
-                c.classList.remove("rouge", "gf");
+            if (c.classList.contains("rouge")) {
+                c.classList.remove("rouge");
                 c.classList.add("kaaris");
             }
     
-            if (c.classList.contains("jaune") || c.classList.contains("pgf")) {
-                c.classList.remove("jaune", "pgf");
+            if (c.classList.contains("jaune") ) {
+                c.classList.remove("jaune");
                 c.classList.add("booba");
             }
         }
     
-        if (theme === "gf") {
-    
-            if (c.classList.contains("kaaris") || c.classList.contains("rouge")) {
-                c.classList.remove("kaaris", "rouge");
-                c.classList.add("gf");
-            }
-    
-            if (c.classList.contains("booba") || c.classList.contains("jaune")) {
-                c.classList.remove("booba", "jaune");
-                c.classList.add("pgf");
-            }
-        }
+
     }
     
     console.log("test jj1 :"+jj1)
@@ -215,6 +204,8 @@ function chCompte(){
 
 
     socket.emit("modiff",{apseudo:apseudo,amdp:amdp,npseudo:npseudo,nmdp:nmdp})
+
+    document.getElementById("partieG").hidden = false;
 
 }
 
@@ -278,7 +269,7 @@ function reset(){
 
 socket.on("resetClient",()=>{
     document.querySelectorAll(".zone-jeton").forEach(div => {
-        div.classList.remove("rouge", "jaune", "booba", "kaaris", "gf", "pgf");//ajouter si autres classes
+        div.classList.remove("rouge", "jaune", "booba", "kaaris");//ajouter si autres classes
     });
     document.getElementById("reset").style.backgroundColor="#56b6ff";
 
@@ -286,7 +277,7 @@ socket.on("resetClient",()=>{
 
 function resetClient(){
     document.querySelectorAll(".zone-jeton").forEach(div => {
-        div.classList.remove("rouge", "jaune", "booba", "kaaris", "gf", "pgf");//ajouter si autres classes
+        div.classList.remove("rouge", "jaune", "booba", "kaaris");//ajouter si autres classes
     });
     document.getElementById("reset").style.backgroundColor="#56b6ff";
 }
@@ -380,12 +371,10 @@ socket.on("placement",(data)=>{
     if(data.player===1){
         if(th === "spider") div.classList.add("rouge");
         if(th === "bk") div.classList.add("kaaris");
-        if(th === "gf") div.classList.add("gf")
     }
     else{
         if(th === "spider") div.classList.add("jaune");
         if(th === "bk") div.classList.add("booba");
-        if(th === "gf") div.classList.add("pgf")
     } 
 });
 
