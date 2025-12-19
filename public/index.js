@@ -35,6 +35,9 @@ function deconnecter(){
 socket.on("nologin_ok",(data)=>{
     joueur.pseudo=data.pseudo;
     joueur.elo=data.elo;
+    console.log(data.pseudo)
+    console.log(data.elo)
+
 });
 
 function connexionCompte(){

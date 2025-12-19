@@ -89,15 +89,12 @@ io.on("connection", (socket) => {
     }
     else{
         session.joueur = {
-            pseudo: "Invite "+socket.id.substring(15),
+            pseudo: "Invite "+socket.id.substring(7,12),
             elo: 0
         }
         console.log("nouvelle connexion : ", session.joueur.pseudo);
         
-        socket.emit("setJoueur",{
-            pseudo: session.pseudo,
-            elo: session.elo
-        });
+        socket.emit("login_ok", (session.joueur));
     }
 
     
@@ -129,7 +126,7 @@ io.on("connection", (socket) => {
     socket.on("nologin",()=>{
         delete session.joueur;
         session.joueur = {
-            pseudo: "Invite "+socket.id.substring(15),
+            pseudo: "Invite "+socket.id.substring(7,12),
             elo: 0
         }
         socket.emit("nologin_ok",{
@@ -497,8 +494,14 @@ setInterval(classement,1000)
 
 async function Demarrage(){
     await bdd.connexion();
+    /*
     server.listen(PORT, "localhost",()=>{
         console.log("serv démarré : http://localhost:"+PORT);
+    });
+    */
+
+    server.listen(PORT, "10.187.52.54",()=>{
+        console.log("serv démarré : http://10.187.52.54:"+PORT);
     });
 };
 
