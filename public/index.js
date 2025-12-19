@@ -115,7 +115,6 @@ socket.on("sendRoom", (data) => {
     document.getElementById("PARTIE").hidden = false;
     document.getElementById("pseudoP").textContent = joueur.pseudo
     document.getElementById("code").textContent = roomID.substring(4)
-    //document.getElementById("InfoJ1").textContent = joueur.pseudo;
 });
 
 let jj1,jj2;
@@ -256,13 +255,21 @@ function abandon(){
         abandonner=0;
         socket.emit("abandon",{pseudo: joueur.pseudo,roomID});
         document.getElementById("Abandon").style.backgroundColor="#ec3c30";
-        document.getElementById("ab").textContent = "Abandonner"
-
+        document.getElementById("ab").textContent = "Abandonner";
     }
-}   
+}
+
+
 
 socket.on("abandonAdverse",(data)=>{
     console.log(data + " a abandonné");
+    document.getElementById("blockVictoire").hidden=false;
+    if(joueur.pseudo===gagnant){
+        document.getElementById("victoire").textContent = perdant + " a abandonné";
+    }
+    else {
+        document.getElementById("victoire").textContent = "vous avez abandonné";
+    }
 });
 
 function reset(){
@@ -333,6 +340,7 @@ socket.on("quitRoom",()=>{
     if(joueur.elo===0) document.getElementById("blockConnect").hidden = 0;
     else document.getElementById("blockDeconnect").hidden = 0;
     document.getElementById("PARTIE").hidden = 1;
+    document.body.classList.remove("theme-spider", "theme-bk", "theme-gf");
     document.getElementById("code").textContent = roomID.substring(4);
     resetClient();
 });
@@ -347,6 +355,7 @@ socket.on("delRoom",()=>{
     if(joueur.elo===0) document.getElementById("blockConnect").hidden = 0;
     else document.getElementById("blockDeconnect").hidden = 0;
     document.getElementById("PARTIE").hidden = 1;
+    document.body.classList.remove("theme-spider", "theme-bk", "theme-gf");
     document.getElementById("code").textContent = roomID.substring(4);
     resetClient();
 });
