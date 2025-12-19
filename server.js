@@ -533,8 +533,8 @@ setInterval(classement,1000)
 
 async function Demarrage(){
     await bdd.connexion();
-    server.listen(PORT, "192.168.1.59",()=>{
-        console.log("serv démarré : http://192.168.1.59:"+PORT);
+    server.listen(PORT, "10.187.52.55",()=>{
+        console.log("serv démarré : http://10.187.52.55:"+PORT);
     });
 };
 
