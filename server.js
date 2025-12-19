@@ -116,6 +116,7 @@ io.on("connection", (socket) => {
         rankedQueue = rankedQueue.filter(rQ => rQ.socketID !== socket.id);
         let roomID=socket.roomID;
         if(rooms[roomID]) {
+            let room = rooms[roomID];
             io.to(roomID).emit("delRoom");
             jEnJeu=jEnJeu.filter(pseudo => pseudo !==room.joueurs[0]);
             jEnJeu=jEnJeu.filter(pseudo => pseudo !==room.joueurs[1]);
@@ -133,6 +134,10 @@ io.on("connection", (socket) => {
         session.save();
     });
 
+    socket.on("modiff",async (data)=>{
+        let x=await bdd.updateCompte(data.apseudo,data.amdp,data.npseudo,data.nmdp);
+        if(x) socket.emit("chCompte_ok", {pseudo : data.npseudo, mdp : data.nmdp});
+    })
 
     socket.on("connexionCompte", async (data)=>{
         console.log("connexionCompte p/m : " +data.pseudo + " " + data.mdp);
@@ -427,7 +432,8 @@ io.on("connection", (socket) => {
         }
 
         let adversaire=room.IDs[index===0 ? 1 : 0];
-        socket.to(adversaire).emit("abandonAdverse",(data.pseudo));
+        socket.to(roomID).emit("abandonAdverse",(data.pseudo));
+
     });
 
     socket.on("reset",(roomID)=>{
