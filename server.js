@@ -263,6 +263,7 @@ io.on("connection", (socket) => {
         rooms[data.roomID].elo.push(data.elo);
         let tour=Math.floor(Math.random() * 2) + 1;
         rooms[data.roomID].turn = tour;     
+        io.to(data.roomID).emit("txtpseudo",(rooms[data.roomID].joueurs),(rooms[data.roomID].turn))
         socket.roomID=data.roomID;
         io.to(data.roomID).emit("txtpseudo",(rooms[data.roomID].joueurs),(rooms[data.roomID].turn))
         //console.log("Room", data.roomID, rooms[data.roomID]);
@@ -543,14 +544,15 @@ async function Demarrage(){
     /*
     server.listen(PORT, "localhost",()=>{
         console.log("serv démarré : http://localhost:"+PORT);
+    */
     server.listen(PORT, "10.187.52.55",()=>{
         console.log("serv démarré : http://10.187.52.55:"+PORT);
     });
-    */
+    
 
-    server.listen(PORT, "10.187.52.54",()=>{
-        console.log("serv démarré : http://10.187.52.54:"+PORT);
-    });
+    // server.listen(PORT, "10.187.52.54",()=>{
+    //     console.log("serv démarré : http://10.187.52.54:"+PORT);
+    // });
 };
 
 Demarrage();
