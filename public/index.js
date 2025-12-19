@@ -223,6 +223,7 @@ socket.on("sendRoomRanked", (data) => {
     document.getElementById("pseudoP").textContent = joueur.pseudo
     document.getElementById("code").textContent = roomID.substring(4)
     document.getElementById("quitPartie").hidden = true;
+    document.getElementById("dansPartie").style.height = "90px";
 });
 
 let abandonner=0;

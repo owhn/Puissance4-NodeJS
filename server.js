@@ -259,6 +259,7 @@ io.on("connection", (socket) => {
         let tour=Math.floor(Math.random() * 2) + 1;
         rooms[data.roomID].turn = tour;     
         socket.roomID=data.roomID;
+        io.to(data.roomID).emit("txtpseudo",(rooms[data.roomID].joueurs),(rooms[data.roomID].turn))
         //console.log("Room", data.roomID, rooms[data.roomID]);
     });
 
@@ -412,7 +413,7 @@ io.on("connection", (socket) => {
 
     socket.on("abandon",(data)=>{
         console.log(data.pseudo + " a abandonné");
-        room=rooms[data.roomID];
+        let room=rooms[data.roomID];
         let index=room.joueurs.indexOf(data.pseudo);
         
         if (index === -1) {
