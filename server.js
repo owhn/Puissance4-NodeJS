@@ -259,6 +259,8 @@ io.on("connection", (socket) => {
         let tour=Math.floor(Math.random() * 2) + 1;
         rooms[data.roomID].turn = tour;     
         socket.roomID=data.roomID;
+        io.to(data.roomID).emit("txtpseudo",(rooms[data.roomID].joueurs),(rooms[data.roomID].turn))
+
         //console.log("Room", data.roomID, rooms[data.roomID]);
     });
 
@@ -507,8 +509,8 @@ function matchmakingRanked(){
         tempsAttendu2=(Date.now() - j2.timeJoined) / 1000;
 
         //range de matchmaking de base : 50
-        let range1=50+(tempsAttendu1/2);
-        let range2=50+(tempsAttendu2/2);
+        let range1=50+(tempsAttendu1*2);
+        let range2=50+(tempsAttendu2*2);
         
         if ((j2.elo-j1.elo) <= range1 && (j2.elo-j1.elo) <= range2){
             let roomID = genRoomID();
