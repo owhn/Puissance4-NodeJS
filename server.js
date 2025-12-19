@@ -49,7 +49,7 @@ const rooms = {
     votesNul: [],
     turn: 0,
     board: creerTabVide()
-}; //rooms[roomID] = {joueurs = [pseudoJ1, pseudoJ2] , ID = [localPlayerIDs]}R
+}; //rooms[roomID] = {joueurs = [pseudoJ1, pseudoJ2] , ID = [socket.id]}
 
 let rankedQueue = [];// joueur : {socketID, elo,timestamp:Date.now()}
 let queue = [];// socketID
@@ -111,18 +111,51 @@ io.on("connection", (socket) => {
     
 
 
-    socket.on("disconnect", () => {
-        queue = queue.filter(id => id !== socket.id); //enlever le joueur des queues
+    socket.on("disconnect", async () => {
+
+        // enlever des queues
+        queue = queue.filter(id => id !== socket.id);
         rankedQueue = rankedQueue.filter(rQ => rQ.socketID !== socket.id);
-        let roomID=socket.roomID;
-        if(rooms[roomID]) {
-            io.to(roomID).emit("delRoom");
-            jEnJeu=jEnJeu.filter(pseudo => pseudo !==room.joueurs[0]);
-            jEnJeu=jEnJeu.filter(pseudo => pseudo !==room.joueurs[1]);
-            delete rooms[roomID];
-            console.log("room " + roomID + " supprimée");
+    
+        const roomID = socket.roomID;
+        if (!roomID || !rooms[roomID]) return;
+    
+        const room = rooms[roomID];
+    
+        // retrouver l'index du joueur
+        const joueurIndex = room.IDs.indexOf(socket.id);
+        if (joueurIndex === -1) return;
+    
+        const adversaireIndex = joueurIndex === 0 ? 1 : 0;
+    
+        const adversaireSocketID = room.IDs[adversaireIndex];
+        const pseudoAdversaire = room.joueurs[adversaireIndex];
+    
+        // annoncer la victoire à l'adversaire
+    
+        if (room.elo && room.elo.length === 2) {
+            try {
+                const eloW = 30;
+                const eloL = -30;
+    
+                await bdd.updateElo(room.joueurs[adversaireIndex], eloW);
+                await bdd.updateElo(room.joueurs[joueurIndex], eloL);
+            } catch (e) {
+                console.error("Erreur ELO disconnect :", e);
+            }
         }
+        
+        // supprimer la room
+        delete rooms[roomID];
+        socket.to(adversaireSocketID).emit("abandonAdverse",{
+            gagnant: pseudoAdversaire,
+            perdant: room.joueurs[joueurIndex]
+        });
+        console.log("Room supprimée (disconnect) :", roomID);
+        jEnJeu=jEnJeu.filter(pseudo => pseudo !==room.joueurs[0]);
+        jEnJeu=jEnJeu.filter(pseudo => pseudo !==room.joueurs[1]);
     });
+    
 
     socket.on("nologin",()=>{
         delete session.joueur;
@@ -227,7 +260,8 @@ io.on("connection", (socket) => {
             queue = queue.filter(id => id !== socket.id);
         }
 
-        if(rankedQueue.includes(socket.id)) return;
+        if (rankedQueue.some(j => j.socketID === socket.id)) return;
+
                 
         rankedQueue.push({
             socketID: socket.id,
@@ -258,6 +292,8 @@ io.on("connection", (socket) => {
         rooms[data.roomID].elo.push(data.elo);
         let tour=Math.floor(Math.random() * 2) + 1;
         rooms[data.roomID].turn = tour;     
+
+        io.to(data.roomID).emit("txtpseudo",(rooms[data.roomID].joueurs),(rooms[data.roomID].turn))
         socket.roomID=data.roomID;
         //console.log("Room", data.roomID, rooms[data.roomID]);
     });
@@ -321,7 +357,6 @@ io.on("connection", (socket) => {
 
         if (data.localPlayerID === room.IDs[0]) io.to(data.roomID).emit("victoire",{pseudo: room.joueurs[1]});
         if (data.localPlayerID === room.IDs[1]) io.to(data.roomID).emit("victoire",{pseudo: room.joueurs[0]});
-        
     })
 
     socket.on("choix", async (data)=>{
@@ -372,12 +407,16 @@ io.on("connection", (socket) => {
                 
                 if (!room.elo[gagnantIndex] || !room.elo[perdantIndex]) throw ("ERR : elo manquant");
                 console.log("eloG dans room : ",room.elo[gagnantIndex],"\neloP dans room :",room.elo[perdantIndex]);
-                eloDiff=Math.abs(room.elo[gagnantIndex]-room.elo[perdantIndex]);
+                eloDiff=room.elo[gagnantIndex]-room.elo[perdantIndex]
                 let eloW=30;
                 let eloL=-30;
 
                 let surDiff = 0;
-                for (let i = (-eloDiff);i<0;i+=10){
+                let increment=10;
+                if(eloDiff<=0){
+                    increment=-10;
+                }
+                for (let i = eloDiff;i<0;i+=increment){
                     surDiff += 1;
                     eloW += 1 + surDiff/15;
                     eloL -= 1 + surDiff/15;
@@ -392,6 +431,8 @@ io.on("connection", (socket) => {
                 console.error(e);
                 io.to(socket.roomID).emit("erreurBDD", "echec de l'update de l'elo");
             }
+            jEnJeu=jEnJeu.filter(pseudo => pseudo !==room.joueurs[0]);
+            jEnJeu=jEnJeu.filter(pseudo => pseudo !==room.joueurs[1]);
             return;
         }
 
@@ -412,8 +453,8 @@ io.on("connection", (socket) => {
 
     socket.on("abandon",(data)=>{
         console.log(data.pseudo + " a abandonné");
-        room=rooms[data.roomID];
-        let index=room.joueurs.indexOf(data.pseudo);
+        let room=rooms[data.roomID];
+        let index=room.IDs.indexOf(socket.id);
         
         if (index === -1) {
             console.log("joueur introuvable dans la room");
@@ -425,8 +466,11 @@ io.on("connection", (socket) => {
             return;
         }
 
-        let adversaire=room.IDs[index===0 ? 1 : 0];
-        socket.to(adversaire).emit("abandonAdverse",(data.pseudo));
+        let adversaire=room.joueurs[index===0 ? 1 : 0];
+        io.to(data.roomID).emit("abandonAdverse",{
+            perdant: data.pseudo,
+            gagnant: adversaire
+        });
     });
 
     socket.on("reset",(roomID)=>{
@@ -507,8 +551,8 @@ function matchmakingRanked(){
         tempsAttendu2=(Date.now() - j2.timeJoined) / 1000;
 
         //range de matchmaking de base : 50
-        let range1=50+(tempsAttendu1/2);
-        let range2=50+(tempsAttendu2/2);
+        let range1=50+(tempsAttendu1*2);
+        let range2=50+(tempsAttendu2*2);
         
         if ((j2.elo-j1.elo) <= range1 && (j2.elo-j1.elo) <= range2){
             let roomID = genRoomID();
@@ -541,8 +585,8 @@ async function Demarrage(){
     });
     */
 
-    server.listen(PORT, "10.187.52.54",()=>{
-        console.log("serv démarré : http://10.187.52.54:"+PORT);
+    server.listen(PORT, "10.187.52.55",()=>{
+        console.log("serv démarré : http://10.187.52.55:"+PORT);
     });
 };
 
