@@ -410,7 +410,7 @@ io.on("connection", (socket) => {
                 if(gagnantIndex===0) perdantIndex=1;
                 else perdantIndex=0;
                 
-                if (!room.elo[gagnantIndex] || !room.elo[perdantIndex]) throw ("ERR : elo manquant");
+                if (!room.elo[gagnantIndex] || !room.elo[perdantIndex]) return;
                 console.log("eloG dans room : ",room.elo[gagnantIndex],"\neloP dans room :",room.elo[perdantIndex]);
                 eloDiff=room.elo[gagnantIndex]-room.elo[perdantIndex]
                 let eloW=30;
@@ -438,6 +438,7 @@ io.on("connection", (socket) => {
             }
             jEnJeu=jEnJeu.filter(pseudo => pseudo !==room.joueurs[0]);
             jEnJeu=jEnJeu.filter(pseudo => pseudo !==room.joueurs[1]);
+            if (room.elo && room.elo.length === 2) delete rooms[socket.roomID];
             return;
         }
 

@@ -398,6 +398,8 @@ socket.on("victoire",(data)=>{
     console.log("gagnant : " + data.pseudo);
     document.getElementById("blockVictoire").hidden = false;
     document.getElementById("victoire").textContent = "Le gagnant est : " + data.pseudo
+    document.getElementById("quitPartie").hidden = false;
+    document.getElementById("dansPartie").style.height = "150px";
     //clear le client ? ou proposer un rematch ? 
 });
 
