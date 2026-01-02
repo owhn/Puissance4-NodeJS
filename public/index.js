@@ -28,6 +28,11 @@ socket.on("guest", () => {
 
 //BDD :
 
+socket.on("refresh", (elo)=>{
+    joueur.elo=elo;
+    document.getElementById("txtElo").textContent=joueur.elo+"🏆";
+});
+
 function deconnecter(){
     socket.emit("nologin",(joueur.pseudo));
 
@@ -253,10 +258,10 @@ function abandon(){
 
 
 socket.on("abandonAdverse",(data)=>{
-    console.log(data + " a abandonné");
+    console.log(data.perdant + " a abandonné");
     document.getElementById("blockVictoire").hidden=false;
-    if(joueur.pseudo===gagnant){
-        document.getElementById("victoire").textContent = perdant + " a abandonné";
+    if(joueur.pseudo===data.gagnant){
+        document.getElementById("victoire").textContent = data.perdant + " a abandonné";
     }
     else {
         document.getElementById("victoire").textContent = "vous avez abandonné";
@@ -304,7 +309,6 @@ function trouverRoom(){
     let code="room"+document.getElementById("txtCode").value;
     socket.emit("trouverRoom",{
         pseudo: joueur.pseudo,
-        localPlayerID: joueur.localPlayerID,
         roomID: code
     });
 }
@@ -315,6 +319,21 @@ socket.on("roomPV_ok",(data)=>{
     document.getElementById("partieG").hidden = true;
     document.getElementById("dansPartie").hidden = false;
     document.getElementById("code").textContent = roomID.substring(4)
+    roomID=data;
+    console.log("sendRoom : " + roomID);
+    socket.emit("joinRoom", {
+        roomID,
+        pseudo : joueur.pseudo,
+        localPlayerID : joueur.localPlayerID
+    });
+    document.getElementById("partieG").hidden = true;
+    document.getElementById("dansPartie").hidden = false;
+    document.getElementById("dansPartieD").hidden = false;
+    document.getElementById("blockConnect").hidden = true;
+    document.getElementById("blockDeconnect").hidden = true;
+    document.getElementById("PARTIE").hidden = false;
+    document.getElementById("pseudoP").textContent = joueur.pseudo
+    document.getElementById("code").textContent = roomID.substring(4)
 });
 
 function quitterPartie(){
@@ -322,8 +341,14 @@ function quitterPartie(){
 
 }
 
-socket.on("quitRoom",()=>{
+socket.on("quitRoom",(data)=>{
     console.log("partie quittée");
+
+    if (data && typeof data.elo === "number") {
+        joueur.elo = data.elo;
+        document.getElementById("txtElo").textContent = joueur.elo+"🏆";
+    }
+    
     document.getElementById("blockVictoire").hidden = true;
     document.getElementById("partieG").hidden = 0;
     document.getElementById("dansPartie").hidden = 1;
@@ -333,12 +358,20 @@ socket.on("quitRoom",()=>{
     document.getElementById("PARTIE").hidden = 1;
     document.body.classList.remove("theme-spider", "theme-bk", "theme-gf");
     document.getElementById("code").textContent = roomID.substring(4);
+    joueur.elo=data.elo;
+    document.getElementById("txtElo").textContent=joueur.elo+"🏆";
     resetClient();
 });
 
 
-socket.on("delRoom",()=>{
+socket.on("delRoom",(data)=>{
     console.log("room supprimée");
+
+    if (data && typeof data.elo === "number") {
+        joueur.elo = data.elo;
+        document.getElementById("txtElo").textContent = joueur.elo+"🏆";
+    }
+
     document.getElementById("blockVictoire").hidden = true;
     document.getElementById("partieG").hidden = 0;
     document.getElementById("dansPartie").hidden = 1;
@@ -348,6 +381,8 @@ socket.on("delRoom",()=>{
     document.getElementById("PARTIE").hidden = 1;
     document.body.classList.remove("theme-spider", "theme-bk", "theme-gf");
     document.getElementById("code").textContent = roomID.substring(4);
+    joueur.elo=data.elo;
+    document.getElementById("txtElo").textContent=joueur.elo+"🏆";
     resetClient();
 });
 
