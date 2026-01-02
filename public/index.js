@@ -35,7 +35,7 @@ socket.on("refresh", (elo)=>{
 
 function deconnecter(){
     socket.emit("nologin",(joueur.pseudo));
-
+    joueur.elo=0;
     document.getElementById("blockDeconnect").hidden = true
     document.getElementById("blockConnect").hidden = false;
 }
@@ -340,7 +340,7 @@ socket.on("roomPV_ok",(data)=>{
 
 function quitterPartie(){
     socket.emit("quitterPartie",(roomID));
-
+    resetClient();
 }
 
 socket.on("quitRoom",(data)=>{
