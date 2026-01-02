@@ -135,11 +135,31 @@ io.on("connection", (socket) => {
     
         if (room.elo && room.elo.length === 2) {
             try {
-                const eloW = 30;
-                const eloL = -30;
-    
-                await bdd.updateElo(room.joueurs[adversaireIndex], eloW);
-                await bdd.updateElo(room.joueurs[joueurIndex], eloL);
+                let perdantIndex=joueurIndex;
+                let gagnantIndex;
+                if(perdantIndex===0) gagnantIndex=1;
+                else gagnantIndex=0;
+
+                if (!room.elo[gagnantIndex] || !room.elo[perdantIndex]) return;
+                console.log("eloG dans room : ",room.elo[gagnantIndex],"\neloP dans room :",room.elo[perdantIndex]);
+                eloDiff=Math.abs(room.elo[gagnantIndex]-room.elo[perdantIndex]);
+                let eloW=30;
+
+                let surDiff = 0;
+                let diffeur=1;
+                if (room.elo[gagnantIndex]>room.elo[perdantIndex]) diffeur=-1;
+
+                for (let i = eloDiff;i>0;i-=10){
+                    surDiff += diffeur;
+                    eloW += diffeur + surDiff/16;
+                }
+                let eloL=(-eloW);
+
+                
+ 
+                console.log("eloW : ", eloW,"\neloL : ", eloL);
+                await bdd.updateElo(room.joueurs[gagnantIndex],eloW);
+                await bdd.updateElo(room.joueurs[perdantIndex],eloL);
             } catch (e) {
                 console.error("Erreur ELO disconnect :", e);
             }
@@ -311,8 +331,6 @@ io.on("connection", (socket) => {
         let room = rooms[roomID];
         if(!room) {
             socket.emit("quitRoom");
-            jEnJeu=jEnJeu.filter(pseudo => pseudo !==room.joueurs[0]);
-            jEnJeu=jEnJeu.filter(pseudo => pseudo !==room.joueurs[1]);
             return;
         }
             // retrouver l'index du joueur
@@ -325,14 +343,35 @@ io.on("connection", (socket) => {
         const pseudoAdversaire = room.joueurs[adversaireIndex];
     
         // compter comme abandon si room ranked
-    
-        if (room && room.elo && room.elo.length === 2) {
+        if(!room) return;
+
+        if (room.elo && room.elo.length === 2) {
             try {
-                const eloW = 30;
-                const eloL = -30;
-    
-                await bdd.updateElo(room.joueurs[adversaireIndex], eloW);
-                await bdd.updateElo(room.joueurs[joueurIndex], eloL);
+                let perdantIndex=index;
+                let gagnantIndex;
+                if(perdantIndex===0) gagnantIndex=1;
+                else gagnantIndex=0;
+
+                if (!room.elo[gagnantIndex] || !room.elo[perdantIndex]) return;
+                console.log("eloG dans room : ",room.elo[gagnantIndex],"\neloP dans room :",room.elo[perdantIndex]);
+                eloDiff=Math.abs(room.elo[gagnantIndex]-room.elo[perdantIndex]);
+                let eloW=30;
+
+                let surDiff = 0;
+                let diffeur=1;
+                if (room.elo[gagnantIndex]>room.elo[perdantIndex]) diffeur=-1;
+
+                for (let i = eloDiff;i>0;i-=10){
+                    surDiff += diffeur;
+                    eloW += diffeur + surDiff/16;
+                }
+                let eloL=(-eloW);
+
+                
+ 
+                console.log("eloW : ", eloW,"\neloL : ", eloL);
+                await bdd.updateElo(room.joueurs[gagnantIndex],eloW);
+                await bdd.updateElo(room.joueurs[perdantIndex],eloL);
             } catch (e) {
                 console.error("Erreur ELO disconnect :", e);
             }
@@ -445,7 +484,7 @@ io.on("connection", (socket) => {
 
                 if (!room.elo[gagnantIndex] || !room.elo[perdantIndex]) return;
                 console.log("eloG dans room : ",room.elo[gagnantIndex],"\neloP dans room :",room.elo[perdantIndex]);
-                eloDiff=Math.abs(room.elo[1]-room.elo[perdantIndex]);
+                eloDiff=Math.abs(room.elo[gagnantIndex]-room.elo[perdantIndex]);
                 let eloW=30;
 
                 let surDiff = 0;
@@ -489,7 +528,7 @@ io.on("connection", (socket) => {
         io.to(data.roomID).emit("tourSuivant", (room.turn));
     });
 
-    socket.on("abandon",(data)=>{
+    socket.on("abandon", async (data)=>{
         console.log(data.pseudo + " a abandonné");
         let room=rooms[data.roomID];
         let index=room.IDs.indexOf(socket.id);
@@ -503,12 +542,43 @@ io.on("connection", (socket) => {
             console.log("pas d'adversaire");
             return;
         }
+        if (room.elo && room.elo.length === 2) {
+            try {
+                let perdantIndex=index;
+                let gagnantIndex;
+                if(perdantIndex===0) gagnantIndex=1;
+                else gagnantIndex=0;
 
+                if (!room.elo[gagnantIndex] || !room.elo[perdantIndex]) return;
+                console.log("eloG dans room : ",room.elo[gagnantIndex],"\neloP dans room :",room.elo[perdantIndex]);
+                eloDiff=Math.abs(room.elo[gagnantIndex]-room.elo[perdantIndex]);
+                let eloW=30;
+
+                let surDiff = 0;
+                let diffeur=1;
+                if (room.elo[gagnantIndex]>room.elo[perdantIndex]) diffeur=-1;
+
+                for (let i = eloDiff;i>0;i-=10){
+                    surDiff += diffeur;
+                    eloW += diffeur + surDiff/16;
+                }
+                let eloL=(-eloW);
+
+                
+ 
+                console.log("eloW : ", eloW,"\neloL : ", eloL);
+                await bdd.updateElo(room.joueurs[gagnantIndex],eloW);
+                await bdd.updateElo(room.joueurs[perdantIndex],eloL);
+            } catch (e) {
+                console.error("Erreur ELO disconnect :", e);
+            }
+        }
         let adversaire=room.joueurs[index===0 ? 1 : 0];
         io.to(data.roomID).emit("abandonAdverse",{
             perdant: data.pseudo,
             gagnant: adversaire
         });
+        delete rooms[data.roomID];
     });
 
     socket.on("reset",(roomID)=>{

@@ -266,6 +266,8 @@ socket.on("abandonAdverse",(data)=>{
     else {
         document.getElementById("victoire").textContent = "vous avez abandonné";
     }
+    document.getElementById("quitPartie").hidden=false;
+    document.getElementById("dansPartie").style.height = "140px";
 });
 
 function reset(){
