@@ -1,7 +1,7 @@
 /* FRONT END : Mathys */
 @font-face {
     font-family: "cartoon";
-    src: url("images/Star\ Cartoon.otf") format("truetype");
+    src: url("Images//Star\ Cartoon.otf") format("truetype");
   }
 
 
@@ -339,22 +339,22 @@ h1{
 }
 
 .board div.rouge {
-    background: #e22525 url("images/sfspider.png") center/90% no-repeat;
+    background: #e22525 url("Images/sfspider.png") center/90% no-repeat;
     border-color: white;
   }
   
   .board div.jaune {
-    background: #ffe600 url("images/spidernoir.png") center/120% no-repeat;
+    background: #ffe600 url("Images/spidernoir.png") center/120% no-repeat;
     border-color: white;
   }
 
   .board div.booba {
-    background: #ffe600 url("images/booba.png") center/170% no-repeat;
+    background: #ffe600 url("Images/booba.png") center/170% no-repeat;
     border-color: white;
   }
 
   .board div.kaaris {
-    background: #e22525 url("images/kaaris.png") center/120% no-repeat;
+    background: #e22525 url("Images/kaaris.png") center/120% no-repeat;
     border-color: white;
   }
 
@@ -364,20 +364,20 @@ h1{
   /* SPIDER */
 
   .jj1.theme-spider .colonne:hover {
-    background-image: url("images/jspiderr.png");
+    background-image: url("Images/jspiderr.png");
   }
 
   .jj2.theme-spider .colonne:hover {
-    background-image: url("images/jspiderj.png");
+    background-image: url("Images/jspiderj.png");
   }
   
   /* BK */
   .jj1.theme-bk .colonne:hover {
-    background-image: url("images/jkaarisr.png");
+    background-image: url("Images/jkaarisr.png");
   }
   
   .jj2.theme-bk .colonne:hover {
-    background-image: url("images/jboobaj.png");
+    background-image: url("Images/jboobaj.PNG");
   }
   
 
@@ -445,7 +445,7 @@ h1{
     margin-top: -75px;
     margin-left: 250px;
     border-radius: 10px/10px;
-    background: url(images/modif.png)center/100% no-repeat;
+    background: url(Images//modif.png)center/100% no-repeat;
     background-color: #56b6ff;
     border-color: transparent;
     box-shadow:  0px 0px 15px rgb(211, 248, 255);
