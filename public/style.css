@@ -1,7 +1,7 @@
 /* FRONT END : Mathys */
 @font-face {
     font-family: "cartoon";
-    src: url("images/Star\ Cartoon.otf") format("truetype");
+    src: url("Images/Star\ Cartoon.otf") format("truetype");
   }
 
 
@@ -445,7 +445,7 @@ h1{
     margin-top: -75px;
     margin-left: 250px;
     border-radius: 10px/10px;
-    background: url(images/modif.png)center/100% no-repeat;
+    background: url(Images/modif.png)center/100% no-repeat;
     background-color: #56b6ff;
     border-color: transparent;
     box-shadow:  0px 0px 15px rgb(211, 248, 255);
